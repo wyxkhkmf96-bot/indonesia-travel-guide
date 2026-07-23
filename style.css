@@ -337,6 +337,14 @@ figure {
   object-fit: cover;
 }
 
+.scene-card img.scene-focus-kintamani {
+  object-position: center 40%;
+}
+
+.scene-card img.scene-focus-leke {
+  object-position: center 52%;
+}
+
 .scene-card figcaption {
   position: absolute;
   right: 0;

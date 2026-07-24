@@ -6,8 +6,8 @@ const days = [
     route: "上海浦东 → 短转机 → 泗水机场 → 市区酒店",
     main: "落地、休息、准备 Java 段",
     accent: "#f27052",
-    camera: ["12%", "7%", 1.24],
-    node: ["32%", "52%"],
+    coord: [112.75, -7.25],
+    place: "SURABAYA · 7.3°S 112.8°E",
     photos: [
       ["assets/indonesia/bromo.jpg", "EAST JAVA · 抵达火山岛", "东爪哇火山景观"],
       ["assets/maps/daily/day-01.jpg", "DAY 01 ROUTE", "第一天飞抵泗水路线地图"]
@@ -29,8 +29,8 @@ const days = [
     route: "泗水 → Tumpak Sewu → Kapas Biru → 布罗莫",
     main: "观景台 + 峡谷徒步 + 双瀑布",
     accent: "#80c68e",
-    camera: ["7%", "5%", 1.36],
-    node: ["35%", "58%"],
+    coord: [112.92, -8.23],
+    place: "TUMPAK SEWU · 8.2°S 112.9°E",
     photos: [
       ["assets/indonesia/scenes/tumpak-sewu.jpg", "TUMPAK SEWU · 环形水帘", "赛武瀑布环形水帘"],
       ["assets/indonesia/scenes/kapas-biru.jpg", "KAPAS BIRU · 密林高瀑", "Kapas Biru蓝棉瀑布"]
@@ -52,8 +52,8 @@ const days = [
     route: "火山观景台 → 沙海 → 火山口 → 外南梦",
     main: "吉普穿越、沙海、火山口徒步",
     accent: "#e5a756",
-    camera: ["2%", "4%", 1.48],
-    node: ["38%", "57%"],
+    coord: [112.95, -7.94],
+    place: "MOUNT BROMO · 7.9°S 113.0°E",
     photos: [
       ["assets/indonesia/scenes/bromo-sunrise.jpg", "BROMO · 火山晨光", "布罗莫火山晨光"],
       ["assets/indonesia/scenes/bromo-sea-of-sand.jpg", "SEA OF SAND · 吉普穿越", "布罗莫沙海吉普车"]
@@ -75,8 +75,8 @@ const days = [
     route: "外南梦 → 伊真 → 吉打邦 → 吉利马努克 → 洛维纳",
     main: "蓝火、火山湖、轮渡穿越",
     accent: "#59a8f2",
-    camera: ["-4%", "4%", 1.62],
-    node: ["42%", "60%"],
+    coord: [114.24, -8.06],
+    place: "IJEN CRATER · 8.1°S 114.2°E",
     photos: [
       ["assets/indonesia/scenes/ijen-blue-fire.jpg", "IJEN · 蓝色火焰", "伊真火山蓝火"],
       ["assets/indonesia/scenes/ijen-crater.jpg", "CRATER LAKE · 火山湖", "伊真火山湖"]
@@ -98,8 +98,8 @@ const days = [
     route: "洛维纳 → 金塔马尼 → Leke Leke → 乌布",
     main: "火山景观午餐、轻徒步、酒店恢复",
     accent: "#d8ef76",
-    camera: ["-9%", "3%", 1.82],
-    node: ["46%", "59%"],
+    coord: [115.35, -8.24],
+    place: "KINTAMANI · 8.2°S 115.4°E",
     photos: [
       ["assets/indonesia/scenes/kintamani-akasa-lunch.jpg", "AKASA · 巴图尔火山午餐", "金塔马尼巴图尔火山景观餐厅"],
       ["assets/indonesia/scenes/leke-leke-pexels-v2.jpg", "LEKE LEKE · 雨林瀑布", "Leke Leke雨林瀑布"]
@@ -121,8 +121,8 @@ const days = [
     route: "乌布 → ATV 山谷 → Saba 黑沙滩 → 乌布",
     main: "ATV、黑沙滩、SPA",
     accent: "#f2a65a",
-    camera: ["-12%", "5%", 2.02],
-    node: ["48%", "61%"],
+    coord: [115.26, -8.51],
+    place: "UBUD · 8.5°S 115.3°E",
     photos: [
       ["assets/indonesia/scenes/ubud-valley.jpg", "UBUD · 山谷越野", "乌布山谷景观"],
       ["assets/indonesia/scenes/saba-beach.jpg", "SABA · 黑沙海岸", "Saba黑沙滩"]
@@ -144,8 +144,8 @@ const days = [
     route: "乌布 → Sanur → Nusa Penida 西线 → Sanur",
     main: "精灵坠崖、Broken Beach、可控浮潜",
     accent: "#49c3c0",
-    camera: ["-15%", "8%", 2.13],
-    node: ["50%", "64%"],
+    coord: [115.55, -8.73],
+    place: "NUSA PENIDA · 8.7°S 115.6°E",
     photos: [
       ["assets/indonesia/scenes/kelingking.jpg", "KELINGKING · 精灵坠崖", "佩尼达岛精灵坠崖"],
       ["assets/indonesia/scenes/broken-beach.jpg", "BROKEN BEACH · 海蚀拱门", "佩尼达岛破碎沙滩"]
@@ -167,8 +167,8 @@ const days = [
     route: "Sanur → 登巴萨机场 → Labuan Bajo",
     main: "境内飞行、海湾日落、确认船期",
     accent: "#e57d63",
-    camera: ["-22%", "7%", 2.05],
-    node: ["57%", "62%"],
+    coord: [119.88, -8.50],
+    place: "LABUAN BAJO · 8.5°S 119.9°E",
     photos: [
       ["assets/indonesia/scenes/labuan-bajo.jpg", "LABUAN BAJO · 海湾日落", "拉布安巴焦海湾"],
       ["assets/maps/daily/day-08.jpg", "DAY 08 ROUTE", "巴厘岛飞往拉布安巴焦路线地图"]
@@ -190,8 +190,8 @@ const days = [
     route: "Labuan Bajo → Padar → Pink Beach → Komodo → Taka / Manta",
     main: "火山地貌、粉色沙滩、科莫多龙、浮潜",
     accent: "#f38b8e",
-    camera: ["-27%", "7%", 2.23],
-    node: ["60%", "62%"],
+    coord: [119.58, -8.65],
+    place: "KOMODO · 8.7°S 119.6°E",
     photos: [
       ["assets/indonesia/padar.jpg", "PADAR · 火山海湾", "帕达尔岛火山海湾"],
       ["assets/indonesia/pink_beach.jpg", "PINK BEACH · 粉色海岸", "科莫多粉色沙滩"]
@@ -213,8 +213,8 @@ const days = [
     route: "Labuan Bajo → Singapore → Shanghai Pudong",
     main: "开口返程，不走回头路",
     accent: "#d8ef76",
-    camera: ["-8%", "-2%", 1.02],
-    node: ["72%", "42%"],
+    coord: [103.82, 1.35],
+    place: "SINGAPORE · 1.4°N 103.8°E",
     photos: [
       ["assets/indonesia/scenes/labuan-bajo.jpg", "FAREWELL · 海湾清晨", "拉布安巴焦海湾清晨"],
       ["assets/maps/daily/day-10.jpg", "OPEN-JAW ROUTE · 直接回家", "科莫多经新加坡回上海路线地图"]
@@ -230,6 +230,214 @@ const days = [
     cost: ["¥300—600", "送机与餐饮；国际机票另计"]
   }
 ];
+
+class CuteGlobe {
+  constructor(canvas, itinerary) {
+    this.canvas = canvas;
+    this.ctx = canvas.getContext("2d");
+    this.itinerary = itinerary;
+    this.active = 0;
+    this.rotation = [-112.75, 7.25, -7];
+    this.targetRotation = [...this.rotation];
+    this.startRotation = [...this.rotation];
+    this.tweenStart = 0;
+    this.tweenDuration = 1250;
+    this.frame = null;
+    this.features = [];
+    this.mesh = null;
+    this.palette = ["#bedb9d", "#f5d889", "#f3ad91", "#9dd3c2", "#cabde7", "#f5c7cf"];
+    this.projection = d3.geoOrthographic().precision(.45).clipAngle(90);
+    this.path = d3.geoPath(this.projection, this.ctx);
+    this.graticule = d3.geoGraticule10();
+    this.route = [
+      [121.47, 31.23],
+      ...itinerary.map(day => day.coord),
+      [121.47, 31.23]
+    ];
+
+    this.resize = this.resize.bind(this);
+    this.animate = this.animate.bind(this);
+    this.resizeObserver = new ResizeObserver(this.resize);
+    this.resizeObserver.observe(canvas);
+    this.resize();
+    this.loadWorld();
+  }
+
+  async loadWorld() {
+    try {
+      const world = await fetch("assets/maps/countries-50m.json").then(response => {
+        if (!response.ok) throw new Error("World map unavailable");
+        return response.json();
+      });
+      this.features = topojson.feature(world, world.objects.countries).features;
+      this.mesh = topojson.mesh(world, world.objects.countries, (a, b) => a !== b);
+      this.canvas.classList.add("globe-ready");
+      this.draw();
+    } catch (error) {
+      this.canvas.classList.add("globe-fallback");
+      this.draw();
+    }
+  }
+
+  resize() {
+    const rect = this.canvas.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    const ratio = Math.min(window.devicePixelRatio || 1, 2);
+    this.width = rect.width;
+    this.height = rect.height;
+    this.canvas.width = Math.round(rect.width * ratio);
+    this.canvas.height = Math.round(rect.height * ratio);
+    this.ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    this.projection
+      .translate([rect.width / 2, rect.height / 2])
+      .scale(Math.min(rect.width, rect.height) * .405);
+    this.draw();
+  }
+
+  focus(index, immediate = false) {
+    this.active = index;
+    const [longitude, latitude] = this.itinerary[index].coord;
+    this.startRotation = [...this.rotation];
+    const desired = [-longitude, -latitude, -7];
+    const delta = ((desired[0] - this.startRotation[0] + 540) % 360) - 180;
+    this.targetRotation = [this.startRotation[0] + delta, desired[1], desired[2]];
+    this.tweenStart = performance.now() - (immediate ? this.tweenDuration : 0);
+    if (this.frame) cancelAnimationFrame(this.frame);
+    this.frame = requestAnimationFrame(this.animate);
+  }
+
+  animate(now) {
+    const raw = Math.min(1, (now - this.tweenStart) / this.tweenDuration);
+    const eased = 1 - Math.pow(1 - raw, 4);
+    this.rotation = this.startRotation.map((value, index) =>
+      value + (this.targetRotation[index] - value) * eased
+    );
+    this.draw();
+    if (raw < 1) this.frame = requestAnimationFrame(this.animate);
+  }
+
+  colorFor(feature) {
+    const name = feature.properties?.name || "";
+    if (name === "Indonesia") return "#d8ef76";
+    const seed = String(feature.id || name).split("").reduce((sum, char) => sum + char.charCodeAt(0), 0);
+    return this.palette[seed % this.palette.length];
+  }
+
+  isVisible(coordinate) {
+    const center = [-this.rotation[0], -this.rotation[1]];
+    return d3.geoDistance(coordinate, center) < Math.PI / 2;
+  }
+
+  strokeRoute(coordinates, color, width, dash = []) {
+    if (coordinates.length < 2) return;
+    this.ctx.beginPath();
+    this.path({ type: "LineString", coordinates });
+    this.ctx.setLineDash(dash);
+    this.ctx.strokeStyle = color;
+    this.ctx.lineWidth = width;
+    this.ctx.lineCap = "round";
+    this.ctx.lineJoin = "round";
+    this.ctx.stroke();
+    this.ctx.setLineDash([]);
+  }
+
+  drawPin(coordinate, number, state) {
+    if (!this.isVisible(coordinate)) return;
+    const point = this.projection(coordinate);
+    if (!point) return;
+    const [x, y] = point;
+    const active = state === "active";
+    const passed = state === "passed";
+
+    if (active) {
+      this.ctx.beginPath();
+      this.ctx.arc(x, y, 16, 0, Math.PI * 2);
+      this.ctx.fillStyle = "rgba(255,255,255,.2)";
+      this.ctx.fill();
+    }
+
+    this.ctx.beginPath();
+    this.ctx.arc(x, y, active ? 10 : 6.5, 0, Math.PI * 2);
+    this.ctx.fillStyle = active ? this.itinerary[this.active].accent : (passed ? "#d8ef76" : "#153e3a");
+    this.ctx.fill();
+    this.ctx.strokeStyle = "#fffaf0";
+    this.ctx.lineWidth = active ? 2.5 : 1.5;
+    this.ctx.stroke();
+
+    this.ctx.fillStyle = active ? "#102e2a" : "#fffaf0";
+    this.ctx.font = `${active ? 700 : 600} ${active ? 9 : 7}px DM Sans, sans-serif`;
+    this.ctx.textAlign = "center";
+    this.ctx.textBaseline = "middle";
+    this.ctx.fillText(String(number), x, y + .5);
+  }
+
+  draw() {
+    if (!this.width || !this.height) return;
+    const ctx = this.ctx;
+    ctx.clearRect(0, 0, this.width, this.height);
+    this.projection.rotate(this.rotation);
+
+    ctx.save();
+    ctx.beginPath();
+    this.path({ type: "Sphere" });
+    const ocean = ctx.createRadialGradient(
+      this.width * .37, this.height * .29, 0,
+      this.width * .5, this.height * .5, Math.min(this.width, this.height) * .48
+    );
+    ocean.addColorStop(0, "#aee1e3");
+    ocean.addColorStop(.55, "#67afbd");
+    ocean.addColorStop(1, "#287785");
+    ctx.fillStyle = ocean;
+    ctx.fill();
+
+    ctx.beginPath();
+    this.path(this.graticule);
+    ctx.strokeStyle = "rgba(255,255,255,.14)";
+    ctx.lineWidth = .65;
+    ctx.stroke();
+
+    this.features.forEach(feature => {
+      ctx.beginPath();
+      this.path(feature);
+      ctx.fillStyle = this.colorFor(feature);
+      ctx.fill();
+    });
+
+    if (this.mesh) {
+      ctx.beginPath();
+      this.path(this.mesh);
+      ctx.strokeStyle = "rgba(18,71,65,.32)";
+      ctx.lineWidth = .55;
+      ctx.stroke();
+    }
+
+    this.strokeRoute(this.route, "rgba(255,250,240,.42)", 2, [3, 6]);
+    const completed = [
+      this.route[0],
+      ...this.itinerary.slice(0, this.active + 1).map(day => day.coord)
+    ];
+    if (this.active === this.itinerary.length - 1) completed.push([121.47, 31.23]);
+    this.strokeRoute(completed, this.itinerary[this.active].accent, 3.3);
+
+    this.itinerary.forEach((day, index) => {
+      const state = index === this.active ? "active" : (index < this.active ? "passed" : "future");
+      this.drawPin(day.coord, index + 1, state);
+    });
+
+    ctx.beginPath();
+    this.path({ type: "Sphere" });
+    ctx.strokeStyle = "rgba(255,255,255,.62)";
+    ctx.lineWidth = 2.2;
+    ctx.stroke();
+
+    ctx.beginPath();
+    this.path({ type: "Sphere" });
+    ctx.strokeStyle = "rgba(149,201,190,.22)";
+    ctx.lineWidth = 9;
+    ctx.stroke();
+    ctx.restore();
+  }
+}
 
 const elements = {
   story: document.querySelector("#day-story"),
@@ -251,13 +459,13 @@ const elements = {
   costNote: document.querySelector("#day-cost-note"),
   current: document.querySelector("#scene-current"),
   rail: document.querySelector("#day-rail"),
-  nodes: document.querySelector("#route-nodes"),
-  map: document.querySelector("#map-rig")
+  globeLabel: document.querySelector("#globe-location")
 };
 
 let activeDay = 0;
 let wheelLocked = false;
 let touchStart = null;
+const globe = new CuteGlobe(document.querySelector("#globe-canvas"), days);
 
 function buildControls() {
   days.forEach((day, index) => {
@@ -269,13 +477,6 @@ function buildControls() {
     railButton.setAttribute("aria-label", `第${index + 1}天：${day.title}`);
     railButton.addEventListener("click", () => setDay(index));
     elements.rail.appendChild(railButton);
-
-    const node = document.createElement("div");
-    node.className = "route-node";
-    node.style.setProperty("--x", day.node[0]);
-    node.style.setProperty("--y", day.node[1]);
-    node.innerHTML = `<span>${String(index + 1).padStart(2, "0")} ${day.short}</span>`;
-    elements.nodes.appendChild(node);
   });
 }
 
@@ -308,20 +509,13 @@ function updateContent(day) {
 
 function updateStage(day) {
   document.documentElement.style.setProperty("--day-accent", day.accent);
-  document.documentElement.style.setProperty("--camera-x", day.camera[0]);
-  document.documentElement.style.setProperty("--camera-y", day.camera[1]);
-  document.documentElement.style.setProperty("--camera-scale", day.camera[2]);
-  elements.map.style.setProperty("--active-x", day.node[0]);
-  elements.map.style.setProperty("--active-y", day.node[1]);
+  elements.globeLabel.textContent = day.place;
+  globe.focus(activeDay, document.body.classList.contains("intro-open"));
 
   [...elements.rail.children].forEach((button, index) => {
     button.classList.toggle("active", index === activeDay);
     button.classList.toggle("passed", index < activeDay);
     button.setAttribute("aria-current", index === activeDay ? "step" : "false");
-  });
-  [...elements.nodes.children].forEach((node, index) => {
-    node.classList.toggle("active", index === activeDay);
-    node.classList.toggle("passed", index < activeDay);
   });
 }
 

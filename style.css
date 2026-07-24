@@ -10,11 +10,6 @@
   --coral: #f27052;
   --sky: #95c9be;
   --day-accent: #f27052;
-  --camera-x: 0%;
-  --camera-y: 5%;
-  --camera-scale: 1.05;
-  --camera-rotate-x: 58deg;
-  --camera-rotate-z: -7deg;
 }
 
 * { box-sizing: border-box; }
@@ -63,7 +58,7 @@ button { color: inherit; }
   align-items: center;
   padding: clamp(28px, 5vw, 84px);
   overflow: hidden;
-  background: #0a2420;
+  background: transparent;
   transition: opacity .7s ease, visibility .7s ease, transform 1s cubic-bezier(.22,.8,.25,1);
 }
 
@@ -72,22 +67,18 @@ button { color: inherit; }
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: linear-gradient(90deg, rgba(4,24,21,.95) 0%, rgba(4,24,21,.7) 38%, rgba(4,24,21,.1) 78%),
-              linear-gradient(0deg, rgba(4,24,21,.75), transparent 55%);
+  background:
+    linear-gradient(90deg, #071f1d 0%, rgba(7,31,29,.97) 36%, rgba(7,31,29,.68) 57%, rgba(7,31,29,.12) 84%),
+    linear-gradient(0deg, rgba(4,24,21,.68), transparent 55%);
 }
 
 .intro-bg {
   position: absolute;
-  inset: -5%;
+  inset: 0;
   z-index: -2;
-  background: url("assets/indonesia/bromo.jpg") center 45% / cover no-repeat;
-  filter: saturate(.78) contrast(1.08);
-  transform: scale(1.05);
-  animation: intro-drift 14s ease-in-out infinite alternate;
-}
-
-@keyframes intro-drift {
-  to { transform: scale(1.12) translate3d(-1.4%, -1%, 0); }
+  background:
+    radial-gradient(circle at 76% 38%, rgba(216,239,118,.1), transparent 30%),
+    radial-gradient(circle at 90% 82%, rgba(242,112,82,.12), transparent 26%);
 }
 
 .intro-copy {
@@ -181,6 +172,23 @@ body:not(.intro-open) .intro {
   opacity: 0;
   visibility: hidden;
   transform: scale(1.06);
+  pointer-events: none;
+}
+
+.topbar,
+.scene-index,
+.day-story,
+.day-rail,
+.scroll-hint {
+  transition: opacity .55s ease;
+}
+
+body.intro-open .topbar,
+body.intro-open .scene-index,
+body.intro-open .day-story,
+body.intro-open .day-rail,
+body.intro-open .scroll-hint {
+  opacity: 0;
   pointer-events: none;
 }
 
@@ -280,110 +288,163 @@ body:not(.intro-open) .intro {
   background: var(--acid);
 }
 
-.map-viewport {
+.globe-viewport {
   position: absolute;
   z-index: 1;
-  top: 7%;
-  right: -7%;
-  width: 70vw;
-  height: 72vh;
-  perspective: 1500px;
+  top: 7.5%;
+  right: -2%;
+  width: min(64vw, 980px);
+  height: min(86vh, 900px);
   pointer-events: none;
 }
 
-.map-rig {
-  position: absolute;
-  width: 112%;
-  aspect-ratio: 2800 / 1440;
-  left: 1%;
-  top: 9%;
-  transform-style: preserve-3d;
-  transform-origin: center;
-  transform: translate3d(var(--camera-x), var(--camera-y), 0) scale(var(--camera-scale)) rotateX(var(--camera-rotate-x)) rotateZ(var(--camera-rotate-z));
-  transition: transform 1.15s cubic-bezier(.16,.8,.22,1);
-}
-
-.route-map,
-.map-base,
-.map-shadow,
-.map-glow,
-.route-nodes {
+.globe-wrap {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
+  display: grid;
+  place-items: center;
+  isolation: isolate;
 }
 
-.route-map {
-  z-index: 8;
-  object-fit: contain;
-  filter: saturate(.82) contrast(1.08) brightness(.72);
-  border-radius: 4px;
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,.12);
-}
-
-.map-base {
-  border-radius: 5px;
-  background: #0d3631;
-  clip-path: inset(1.5% 0 0 0 round 4px);
-}
-
-.map-base-1 { z-index: 6; transform: translateZ(-12px) translateY(10px); opacity: .8; }
-.map-base-2 { z-index: 5; transform: translateZ(-24px) translateY(20px); opacity: .6; }
-.map-base-3 { z-index: 4; transform: translateZ(-36px) translateY(30px); opacity: .35; }
-
-.map-shadow {
-  z-index: 2;
-  transform: translateZ(-48px) translateY(62px) scale(.94);
-  background: rgba(0,0,0,.68);
-  filter: blur(32px);
-}
-
-.map-glow {
-  z-index: 9;
-  background: radial-gradient(circle at var(--active-x, 35%) var(--active-y, 60%), color-mix(in srgb, var(--day-accent) 42%, transparent), transparent 12%);
-  mix-blend-mode: screen;
-  transition: background 1s ease;
-}
-
-.route-nodes { z-index: 12; }
-
-.route-node {
+.globe-aura {
   position: absolute;
-  left: var(--x);
-  top: var(--y);
-  width: 19px;
-  height: 19px;
-  transform: translate(-50%, -50%) rotateZ(7deg) rotateX(-58deg);
+  z-index: -3;
+  width: 76%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, color-mix(in srgb, var(--day-accent) 28%, transparent), transparent 66%),
+    radial-gradient(circle, rgba(216,239,118,.12), transparent 72%);
+  filter: blur(14px);
+  transition: background 1s ease;
+  animation: globe-breathe 4s ease-in-out infinite;
+}
+
+@keyframes globe-breathe {
+  50% { transform: scale(1.06); opacity: .74; }
+}
+
+.globe-shadow {
+  position: absolute;
+  z-index: -2;
+  bottom: 9%;
+  width: 50%;
+  height: 8%;
+  border-radius: 50%;
+  background: rgba(0,0,0,.66);
+  filter: blur(20px);
+  transform: rotate(-4deg);
+}
+
+.globe-canvas {
+  position: relative;
+  z-index: 3;
+  width: 88%;
+  height: 88%;
+  filter: drop-shadow(0 34px 36px rgba(0,0,0,.42));
+}
+
+.globe-shine {
+  position: absolute;
+  z-index: 5;
+  top: 14.5%;
+  left: 23%;
+  width: 22%;
+  height: 13%;
+  border-radius: 50%;
+  background: rgba(255,255,255,.13);
+  filter: blur(18px);
+  transform: rotate(-29deg);
+  mix-blend-mode: screen;
+}
+
+.orbit-ring {
+  position: absolute;
+  z-index: 1;
+  width: 91%;
+  aspect-ratio: 1.8;
   border: 1px solid rgba(255,255,255,.82);
   border-radius: 50%;
-  background: #173c38;
-  box-shadow: 0 0 0 7px rgba(255,255,255,.08);
-  transition: width .5s ease, height .5s ease, background .5s ease, box-shadow .5s ease;
+  opacity: .18;
 }
 
-.route-node span {
+.orbit-ring-a { transform: rotate(-13deg); }
+.orbit-ring-b { transform: rotate(64deg) scale(.87); opacity: .1; }
+
+.orbit-star {
   position: absolute;
-  left: 50%;
-  bottom: calc(100% + 9px);
-  transform: translateX(-50%);
-  white-space: nowrap;
-  color: rgba(255,255,255,.62);
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: .08em;
-  text-shadow: 0 2px 8px #051614;
+  z-index: 6;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--night);
+  background: var(--acid);
+  box-shadow: 0 0 28px rgba(216,239,118,.45);
+  animation: star-float 3.8s ease-in-out infinite;
 }
 
-.route-node.active {
+.orbit-star-a {
+  top: 20%;
+  right: 13%;
   width: 31px;
   height: 31px;
-  background: var(--day-accent);
-  box-shadow: 0 0 0 9px rgba(255,255,255,.1), 0 0 30px var(--day-accent);
+  font-size: 13px;
 }
 
-.route-node.active span { color: #fff; font-size: 11px; }
-.route-node.passed { background: var(--acid); }
+.orbit-star-b {
+  left: 11%;
+  bottom: 22%;
+  width: 13px;
+  height: 13px;
+  color: var(--coral);
+  background: var(--coral);
+  animation-delay: -1.7s;
+}
+
+@keyframes star-float {
+  50% { transform: translateY(-12px) rotate(14deg); }
+}
+
+.globe-location {
+  position: absolute;
+  z-index: 8;
+  right: 7%;
+  bottom: 10%;
+  min-width: 214px;
+  padding: 12px 15px;
+  border: 1px solid rgba(255,255,255,.22);
+  border-radius: 14px;
+  background: rgba(7,31,29,.76);
+  box-shadow: 0 14px 38px rgba(0,0,0,.25);
+  backdrop-filter: blur(12px);
+}
+
+.globe-location::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 7px;
+  border-radius: 50%;
+  background: var(--day-accent);
+  box-shadow: 0 0 12px var(--day-accent);
+  vertical-align: 1px;
+}
+
+.globe-location small {
+  color: rgba(255,255,255,.42);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: .13em;
+}
+
+.globe-location strong {
+  display: block;
+  margin-top: 4px;
+  color: var(--ink);
+  font-size: 10px;
+  letter-spacing: .07em;
+}
 
 .scene-index {
   position: absolute;
@@ -811,7 +872,7 @@ body:not(.intro-open) .intro {
 
 @media (max-width: 980px) {
   .trip-meta { display: none; }
-  .map-viewport { width: 82vw; right: -26vw; top: 5%; opacity: .78; }
+  .globe-viewport { width: 74vw; right: -17vw; top: 4%; opacity: .84; }
   .day-story { left: 70px; width: min(620px, calc(100vw - 110px)); }
   .day-bottom { grid-template-columns: 1.2fr 1fr .72fr; }
 }
@@ -830,19 +891,18 @@ body:not(.intro-open) .intro {
   .plan-button { font-size: 11px; }
   .scene-index { top: 66px; right: 16px; }
 
-  .map-viewport {
+  .globe-viewport {
     top: 5vh;
-    left: 17vw;
+    left: 25vw;
     right: auto;
-    width: 112vw;
-    height: 39vh;
-    opacity: .78;
+    width: 91vw;
+    height: 41vh;
+    opacity: .88;
   }
 
-  .map-rig {
-    --camera-rotate-x: 48deg;
-    top: 4%;
-  }
+  .globe-canvas { width: 96%; height: 96%; }
+  .globe-location { right: 9%; bottom: 2%; min-width: 170px; padding: 8px 10px; }
+  .orbit-star-a { right: 4%; }
 
   .day-story {
     left: 18px;

@@ -7,9 +7,8 @@
   <meta name="theme-color" content="#071f1d">
   <meta property="og:title" content="一路向东｜印尼 10 天 9 晚">
   <meta property="og:description" content="沿着立体路线图，从东爪哇火山一路走到科莫多。每天的玩法、酒店、预算和注意事项都在一张行程舞台上。">
-  <meta property="og:image" content="https://wyxkhkmf96-bot.github.io/indonesia-travel-guide/assets/indonesia/social-cover-v2.png">
+  <meta property="og:image" content="https://wyxkhkmf96-bot.github.io/indonesia-travel-guide/assets/indonesia/social-cover-v3.png">
   <title>一路向东｜印尼 10 天 9 晚</title>
-  <link rel="preload" as="image" href="indonesia-route-map.png">
   <link rel="preload" as="image" href="assets/indonesia/bromo.jpg">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -49,15 +48,20 @@
       <div class="ambient ambient-a" aria-hidden="true"></div>
       <div class="ambient ambient-b" aria-hidden="true"></div>
 
-      <div class="map-viewport" aria-hidden="true">
-        <div class="map-rig" id="map-rig">
-          <div class="map-shadow"></div>
-          <div class="map-base map-base-3"></div>
-          <div class="map-base map-base-2"></div>
-          <div class="map-base map-base-1"></div>
-          <img class="route-map" src="indonesia-route-map.png" alt="">
-          <div class="map-glow"></div>
-          <div class="route-nodes" id="route-nodes"></div>
+      <div class="globe-viewport" aria-hidden="true">
+        <div class="globe-wrap">
+          <div class="globe-aura"></div>
+          <div class="globe-shadow"></div>
+          <div class="orbit-ring orbit-ring-a"></div>
+          <div class="orbit-ring orbit-ring-b"></div>
+          <span class="orbit-star orbit-star-a">✦</span>
+          <span class="orbit-star orbit-star-b">●</span>
+          <canvas class="globe-canvas" id="globe-canvas"></canvas>
+          <div class="globe-shine"></div>
+          <div class="globe-location">
+            <small>EARTH FOCUS</small>
+            <strong id="globe-location">SURABAYA · 7.3°S 112.8°E</strong>
+          </div>
         </div>
       </div>
 
@@ -168,6 +172,8 @@
   <noscript>
     <div class="noscript">此行程舞台需要启用 JavaScript 才能切换 10 天内容。</div>
   </noscript>
+  <script src="assets/vendor/d3.min.js"></script>
+  <script src="assets/vendor/topojson-client.min.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

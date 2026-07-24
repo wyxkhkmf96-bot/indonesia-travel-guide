@@ -21,7 +21,7 @@
     <div class="intro-copy">
       <p class="kicker">INDONESIA · 09.27—10.06</p>
       <h1 id="intro-title">一路向东，<br><em>直到科莫多。</em></h1>
-      <p class="intro-lead">3 人 · 2 间房 · 泗水进 / 科莫多出<br>一场火山、瀑布、悬崖与粉色海岸组成的 10 天旅程。</p>
+      <p class="intro-lead">3 人 · 2 间房 · 泗水进 / 科莫多出<br>从完整地球飞入 3D 微缩岛屿，逐站走完火山、瀑布、悬崖与粉色海岸。</p>
       <button class="start-button" id="start-button" type="button">
         <span>进入行程</span><i aria-hidden="true">↗</i>
       </button>
@@ -48,6 +48,15 @@
       <div class="ambient ambient-a" aria-hidden="true"></div>
       <div class="ambient ambient-b" aria-hidden="true"></div>
 
+      <div class="terrain-stage" id="terrain-stage" aria-hidden="true">
+        <canvas class="terrain-canvas" id="terrain-canvas"></canvas>
+        <div class="terrain-vignette"></div>
+        <div class="terrain-loading" id="terrain-loading">
+          <i></i><span>正在搭建 3D 岛屿沙盘</span><b id="terrain-progress">0%</b>
+        </div>
+        <small class="terrain-source">地理轮廓：Natural Earth · 景点位置：真实经纬度</small>
+      </div>
+
       <div class="globe-viewport" aria-hidden="true">
         <div class="globe-wrap">
           <div class="globe-aura"></div>
@@ -63,16 +72,17 @@
             <strong id="globe-location">SURABAYA · 7.3°S 112.8°E</strong>
             <span id="globe-view">WORLD VIEW · 1.0×</span>
           </div>
-          <div class="region-legend" aria-label="印尼行程区域颜色">
-            <span><i class="java-dot"></i>东爪哇</span>
-            <span><i class="bali-dot"></i>巴厘岛</span>
-            <span><i class="komodo-dot"></i>科莫多</span>
-          </div>
-          <div class="transport-card" id="transport-card">
-            <b id="transport-icon">✈</b>
-            <div><small>TRANSFER</small><strong id="transport-label">国际航班</strong><span id="transport-detail">上海 → 泗水</span></div>
-          </div>
         </div>
+      </div>
+
+      <div class="region-legend" aria-label="印尼行程区域颜色">
+        <span><i class="java-dot"></i>东爪哇</span>
+        <span><i class="bali-dot"></i>巴厘岛</span>
+        <span><i class="komodo-dot"></i>科莫多</span>
+      </div>
+      <div class="transport-card" id="transport-card">
+        <b id="transport-icon">✈</b>
+        <div><small>TRANSFER</small><strong id="transport-label">国际航班</strong><span id="transport-detail">上海 → 泗水</span></div>
       </div>
 
       <div class="scene-index" aria-hidden="true">
@@ -104,6 +114,15 @@
               <h3 id="day-main">落地、休息、准备 Java 段</h3>
             </div>
             <ol class="schedule" id="schedule"></ol>
+            <div class="stop-progress">
+              <span id="stop-count">STOP 01 / 04</span>
+              <i><b id="stop-progress-bar"></b></i>
+            </div>
+            <div class="step-controls">
+              <button id="previous-stop" type="button">← 上一站</button>
+              <button id="route-overview" type="button">路线总览</button>
+              <button id="next-stop" type="button">下一站 →</button>
+            </div>
           </div>
         </div>
 
@@ -185,5 +204,6 @@
   <script src="assets/vendor/d3.min.js"></script>
   <script src="assets/vendor/topojson-client.min.js"></script>
   <script src="app.js"></script>
+  <script type="module" src="terrain.js"></script>
 </body>
 </html>

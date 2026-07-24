@@ -10,6 +10,13 @@ const days = [
     place: "SURABAYA · 7.3°S 112.8°E",
     zoom: 18,
     transport: { icon: "✈", mode: "flight", label: "国际航班", detail: "上海 → 泗水" },
+    region: "java",
+    terrainStops: [
+      { coord: [112.35, -7.20], mode: "flight" },
+      { coord: [112.79, -7.38], mode: "flight" },
+      { coord: [112.72, -7.31], mode: "road" },
+      { coord: [112.72, -7.31], mode: "road" }
+    ],
     photos: [
       ["assets/indonesia/bromo.jpg", "EAST JAVA · 抵达火山岛", "东爪哇火山景观"],
       ["assets/maps/daily/day-01.jpg", "DAY 01 ROUTE", "第一天飞抵泗水路线地图"]
@@ -35,6 +42,13 @@ const days = [
     place: "TUMPAK SEWU · 8.2°S 112.9°E",
     zoom: 30,
     transport: { icon: "🚐", mode: "road", label: "JAVA 包车", detail: "泗水 → 赛武瀑布" },
+    region: "java",
+    terrainStops: [
+      { coord: [112.75, -7.25], mode: "road" },
+      { coord: [112.92, -8.23], mode: "road" },
+      { coord: [112.95, -8.22], mode: "road" },
+      { coord: [112.95, -7.94], mode: "road" }
+    ],
     photos: [
       ["assets/indonesia/scenes/tumpak-sewu.jpg", "TUMPAK SEWU · 环形水帘", "赛武瀑布环形水帘"],
       ["assets/indonesia/scenes/kapas-biru.jpg", "KAPAS BIRU · 密林高瀑", "Kapas Biru蓝棉瀑布"]
@@ -60,6 +74,13 @@ const days = [
     place: "MOUNT BROMO · 7.9°S 113.0°E",
     zoom: 30,
     transport: { icon: "🛻", mode: "road", label: "包车 + 火山吉普", detail: "赛武 → 布罗莫 → 外南梦" },
+    region: "java",
+    terrainStops: [
+      { coord: [112.95, -7.94], mode: "jeep" },
+      { coord: [112.95, -7.95], mode: "jeep" },
+      { coord: [112.95, -7.94], mode: "walk" },
+      { coord: [114.37, -8.22], mode: "road" }
+    ],
     photos: [
       ["assets/indonesia/scenes/bromo-sunrise.jpg", "BROMO · 火山晨光", "布罗莫火山晨光"],
       ["assets/indonesia/scenes/bromo-sea-of-sand.jpg", "SEA OF SAND · 吉普穿越", "布罗莫沙海吉普车"]
@@ -85,6 +106,13 @@ const days = [
     place: "IJEN CRATER · 8.1°S 114.2°E",
     zoom: 31,
     transport: { icon: "⛴", mode: "boat", label: "徒步 + 轮渡 + 包车", detail: "伊真 → 巴厘岛西部" },
+    region: "java",
+    terrainStops: [
+      { coord: [114.37, -8.22], mode: "road" },
+      { coord: [114.24, -8.06], mode: "walk" },
+      { coord: [114.24, -8.06], mode: "walk" },
+      { coord: [115.02, -8.16], mode: "ferry" }
+    ],
     photos: [
       ["assets/indonesia/scenes/ijen-blue-fire.jpg", "IJEN · 蓝色火焰", "伊真火山蓝火"],
       ["assets/indonesia/scenes/ijen-crater.jpg", "CRATER LAKE · 火山湖", "伊真火山湖"]
@@ -110,6 +138,13 @@ const days = [
     place: "KINTAMANI · 8.2°S 115.4°E",
     zoom: 38,
     transport: { icon: "🚐", mode: "road", label: "巴厘岛包车", detail: "洛维纳 → 金塔马尼 → 乌布" },
+    region: "bali",
+    terrainStops: [
+      { coord: [115.02, -8.16], mode: "road" },
+      { coord: [115.35, -8.24], mode: "road" },
+      { coord: [115.30, -8.33], mode: "walk" },
+      { coord: [115.26, -8.51], mode: "road" }
+    ],
     photos: [
       ["assets/indonesia/scenes/kintamani-akasa-lunch.jpg", "AKASA · 巴图尔火山午餐", "金塔马尼巴图尔火山景观餐厅"],
       ["assets/indonesia/scenes/leke-leke-pexels-v2.jpg", "LEKE LEKE · 雨林瀑布", "Leke Leke雨林瀑布"]
@@ -135,6 +170,13 @@ const days = [
     place: "UBUD · 8.5°S 115.3°E",
     zoom: 42,
     transport: { icon: "🏍", mode: "road", label: "包车 + ATV", detail: "乌布山谷 → Saba 海岸" },
+    region: "bali",
+    terrainStops: [
+      { coord: [115.26, -8.51], mode: "road" },
+      { coord: [115.28, -8.44], mode: "atv" },
+      { coord: [115.26, -8.51], mode: "road" },
+      { coord: [115.32, -8.62], mode: "road" }
+    ],
     photos: [
       ["assets/indonesia/scenes/ubud-valley.jpg", "UBUD · 山谷越野", "乌布山谷景观"],
       ["assets/indonesia/scenes/saba-beach.jpg", "SABA · 黑沙海岸", "Saba黑沙滩"]
@@ -160,6 +202,13 @@ const days = [
     place: "NUSA PENIDA · 8.7°S 115.6°E",
     zoom: 39,
     transport: { icon: "⛴", mode: "boat", label: "接驳车 + 快船", detail: "Sanur ⇄ 佩尼达岛" },
+    region: "bali",
+    terrainStops: [
+      { coord: [115.26, -8.69], mode: "road" },
+      { coord: [115.45, -8.75], mode: "speedboat" },
+      { coord: [115.45, -8.73], mode: "road" },
+      { coord: [115.55, -8.69], mode: "speedboat" }
+    ],
     photos: [
       ["assets/indonesia/scenes/kelingking.jpg", "KELINGKING · 精灵坠崖", "佩尼达岛精灵坠崖"],
       ["assets/indonesia/scenes/broken-beach.jpg", "BROKEN BEACH · 海蚀拱门", "佩尼达岛破碎沙滩"]
@@ -185,6 +234,13 @@ const days = [
     place: "LABUAN BAJO · 8.5°S 119.9°E",
     zoom: 27,
     transport: { icon: "✈", mode: "flight", label: "境内航班", detail: "巴厘岛 → 拉布安巴焦" },
+    region: "komodo",
+    terrainStops: [
+      { coord: [119.35, -8.35], mode: "flight" },
+      { coord: [119.89, -8.49], mode: "flight" },
+      { coord: [119.88, -8.50], mode: "flight" },
+      { coord: [119.87, -8.49], mode: "road" }
+    ],
     photos: [
       ["assets/indonesia/scenes/labuan-bajo.jpg", "LABUAN BAJO · 海湾日落", "拉布安巴焦海湾"],
       ["assets/maps/daily/day-08.jpg", "DAY 08 ROUTE", "巴厘岛飞往拉布安巴焦路线地图"]
@@ -210,6 +266,13 @@ const days = [
     place: "KOMODO · 8.7°S 119.6°E",
     zoom: 34,
     transport: { icon: "🚤", mode: "boat", label: "科莫多快艇", detail: "Padar → Pink Beach → Komodo" },
+    region: "komodo",
+    terrainStops: [
+      { coord: [119.88, -8.50], mode: "speedboat" },
+      { coord: [119.57, -8.65], mode: "speedboat" },
+      { coord: [119.49, -8.55], mode: "speedboat" },
+      { coord: [119.61, -8.53], mode: "speedboat" }
+    ],
     photos: [
       ["assets/indonesia/padar.jpg", "PADAR · 火山海湾", "帕达尔岛火山海湾"],
       ["assets/indonesia/pink_beach.jpg", "PINK BEACH · 粉色海岸", "科莫多粉色沙滩"]
@@ -235,6 +298,13 @@ const days = [
     place: "SINGAPORE · 1.4°N 103.8°E",
     zoom: 1.55,
     transport: { icon: "✈", mode: "flight", label: "国际联程航班", detail: "科莫多 → 新加坡 → 上海" },
+    region: "komodo",
+    terrainStops: [
+      { coord: [119.88, -8.50], mode: "road" },
+      { coord: [119.89, -8.49], mode: "flight" },
+      { coord: [119.45, -8.28], mode: "flight" },
+      { coord: [119.30, -8.25], mode: "flight" }
+    ],
     photos: [
       ["assets/indonesia/scenes/labuan-bajo.jpg", "FAREWELL · 海湾清晨", "拉布安巴焦海湾清晨"],
       ["assets/maps/daily/day-10.jpg", "OPEN-JAW ROUTE · 直接回家", "科莫多经新加坡回上海路线地图"]
@@ -267,6 +337,8 @@ const terrainFeatures = [
   { label: "Pink Beach", type: "beach", coord: [119.55, -8.54], days: [8], side: "left" },
   { label: "Manta Point", type: "reef", coord: [119.61, -8.53], days: [8], side: "right" }
 ];
+
+window.tripDays = days;
 
 class CuteGlobe {
   constructor(canvas, itinerary) {
@@ -685,13 +757,70 @@ const elements = {
   transportCard: document.querySelector("#transport-card"),
   transportIcon: document.querySelector("#transport-icon"),
   transportLabel: document.querySelector("#transport-label"),
-  transportDetail: document.querySelector("#transport-detail")
+  transportDetail: document.querySelector("#transport-detail"),
+  stopCount: document.querySelector("#stop-count"),
+  stopProgress: document.querySelector("#stop-progress-bar"),
+  previousStop: document.querySelector("#previous-stop"),
+  nextStop: document.querySelector("#next-stop"),
+  routeOverview: document.querySelector("#route-overview")
 };
 
 let activeDay = 0;
+let activeStop = 0;
 let wheelLocked = false;
 let touchStart = null;
+let transitionToken = 0;
 const globe = new CuteGlobe(document.querySelector("#globe-canvas"), days);
+
+const stopTransport = {
+  road: ["🚐", "包车 / 陆路"],
+  jeep: ["🛻", "火山吉普"],
+  atv: ["🏍", "ATV 越野"],
+  walk: ["🥾", "徒步"],
+  boat: ["⛴", "船程"],
+  ferry: ["⛴", "轮渡"],
+  speedboat: ["🚤", "快艇"],
+  flight: ["✈", "航班"]
+};
+
+function getTerrainStage() {
+  if (window.terrainStage) return Promise.resolve(window.terrainStage);
+  return new Promise(resolve => {
+    window.addEventListener("terrain-ready", () => resolve(window.terrainStage), { once: true });
+  });
+}
+
+function renderTransport(index) {
+  const day = days[activeDay];
+  const target = Math.max(0, Math.min(day.schedule.length - 1, index));
+  const item = day.schedule[target];
+  const terrainStop = day.terrainStops[target];
+  const [icon, label] = stopTransport[terrainStop.mode] || [day.transport.icon, day.transport.label];
+  const previousTitle = target > 0 ? day.schedule[target - 1][1] : day.short;
+  elements.transportIcon.textContent = icon;
+  elements.transportLabel.textContent = label;
+  elements.transportDetail.textContent = target > 0 ? `${previousTitle} → ${item[1]}` : day.transport.detail;
+  elements.transportCard.classList.remove("is-moving");
+  void elements.transportCard.offsetWidth;
+  if (!document.body.classList.contains("intro-open")) elements.transportCard.classList.add("is-moving");
+}
+
+function renderStop(index) {
+  const day = days[activeDay];
+  activeStop = Math.max(0, Math.min(day.schedule.length - 1, index));
+  const item = day.schedule[activeStop];
+  elements.schedule.innerHTML = `
+    <li>
+      <time>${item[0]}</time>
+      <div><b>${item[1]}</b><p>${item[2]}</p></div>
+    </li>
+  `;
+  elements.stopCount.textContent = `STOP ${String(activeStop + 1).padStart(2, "0")} / ${String(day.schedule.length).padStart(2, "0")}`;
+  elements.stopProgress.style.width = `${((activeStop + 1) / day.schedule.length) * 100}%`;
+  elements.previousStop.disabled = activeStop === 0;
+  elements.nextStop.disabled = activeStop === day.schedule.length - 1;
+  renderTransport(activeStop);
+}
 
 function buildControls() {
   days.forEach((day, index) => {
@@ -717,12 +846,6 @@ function updateContent(day) {
   elements.secondary.src = day.photos[1][0];
   elements.secondary.alt = day.photos[1][2];
   elements.secondaryCaption.textContent = day.photos[1][1];
-  elements.schedule.innerHTML = day.schedule.map(item => `
-    <li>
-      <time>${item[0]}</time>
-      <div><b>${item[1]}</b><p>${item[2]}</p></div>
-    </li>
-  `).join("");
   elements.hotelName.textContent = day.hotel[0];
   elements.hotelCopy.textContent = day.hotel[1];
   elements.hotelPrice.textContent = day.hotel[2];
@@ -731,20 +854,15 @@ function updateContent(day) {
   elements.cost.textContent = day.cost[0];
   elements.costNote.textContent = day.cost[1];
   elements.current.textContent = String(activeDay + 1).padStart(2, "0");
+  renderStop(0);
 }
 
 function updateStage(day) {
   const overview = document.body.classList.contains("intro-open");
   document.documentElement.style.setProperty("--day-accent", day.accent);
   elements.globeLabel.textContent = overview ? "ASIA → INDONESIA" : day.place;
-  elements.globeView.textContent = overview ? "WORLD VIEW · 1.0×" : `LOCAL VIEW · ${day.zoom.toFixed(1)}×`;
-  elements.transportIcon.textContent = day.transport.icon;
-  elements.transportLabel.textContent = day.transport.label;
-  elements.transportDetail.textContent = day.transport.detail;
-  elements.transportCard.classList.remove("is-moving");
-  void elements.transportCard.offsetWidth;
-  if (!overview) elements.transportCard.classList.add("is-moving");
-  globe.focus(activeDay, overview, overview);
+  elements.globeView.textContent = overview ? "WORLD VIEW · 1.0×" : `REGION · ${day.region.toUpperCase()}`;
+  globe.focus(activeDay, overview, true);
 
   [...elements.rail.children].forEach((button, index) => {
     button.classList.toggle("active", index === activeDay);
@@ -753,14 +871,36 @@ function updateStage(day) {
   });
 }
 
+async function showTerrainDay(index, crossRegion) {
+  const token = ++transitionToken;
+  const stage = await getTerrainStage();
+  if (token !== transitionToken || document.body.classList.contains("intro-open")) return;
+
+  if (crossRegion) {
+    document.body.classList.remove("terrain-mode");
+    document.body.classList.add("globe-transition");
+    globe.focus(index, false, true);
+    await new Promise(resolve => window.setTimeout(resolve, 1050));
+    if (token !== transitionToken) return;
+  }
+
+  await stage.setDay(index);
+  if (token !== transitionToken) return;
+  document.body.classList.add("terrain-mode");
+  document.body.classList.remove("globe-transition");
+}
+
 function setDay(index, immediate = false) {
   const next = Math.max(0, Math.min(days.length - 1, index));
   if (next === activeDay && !immediate) return;
+  const previousRegion = days[activeDay]?.region;
+  const crossRegion = previousRegion !== days[next].region || !document.body.classList.contains("terrain-mode");
   activeDay = next;
 
   if (immediate) {
     updateContent(days[activeDay]);
     updateStage(days[activeDay]);
+    if (!document.body.classList.contains("intro-open")) showTerrainDay(activeDay, crossRegion);
     return;
   }
 
@@ -770,6 +910,7 @@ function setDay(index, immediate = false) {
     updateStage(days[activeDay]);
     elements.story.scrollTop = 0;
     requestAnimationFrame(() => elements.story.classList.remove("is-changing"));
+    showTerrainDay(activeDay, crossRegion);
   }, 260);
 }
 
@@ -781,10 +922,35 @@ function enterExperience() {
 document.querySelector("#start-button").addEventListener("click", enterExperience);
 document.querySelector("#back-home").addEventListener("click", event => {
   event.preventDefault();
+  transitionToken += 1;
+  document.body.classList.remove("terrain-mode", "globe-transition");
   document.body.classList.add("intro-open");
   elements.globeLabel.textContent = "ASIA → INDONESIA";
   elements.globeView.textContent = "WORLD VIEW · 1.0×";
   globe.focus(activeDay, false, true);
+});
+
+async function moveStop(direction) {
+  const target = activeStop + direction;
+  const day = days[activeDay];
+  if (target < 0 || target >= day.schedule.length) return;
+  const stage = await getTerrainStage();
+  elements.previousStop.disabled = true;
+  elements.nextStop.disabled = true;
+  renderTransport(target);
+  const moved = await stage.goToStep(target);
+  if (!moved) renderStop(activeStop);
+}
+
+elements.previousStop.addEventListener("click", () => moveStop(-1));
+elements.nextStop.addEventListener("click", () => moveStop(1));
+elements.routeOverview.addEventListener("click", async () => {
+  const stage = await getTerrainStage();
+  stage.focusOverview();
+});
+
+window.addEventListener("terrain-step-arrived", event => {
+  renderStop(event.detail.step);
 });
 
 const planning = document.querySelector("#planning");
@@ -808,8 +974,10 @@ window.addEventListener("keydown", event => {
     return;
   }
   if (planning.classList.contains("open")) return;
-  if (event.key === "ArrowDown" || event.key === "ArrowRight") setDay(activeDay + 1);
-  if (event.key === "ArrowUp" || event.key === "ArrowLeft") setDay(activeDay - 1);
+  if (event.key === "ArrowRight") moveStop(1);
+  if (event.key === "ArrowLeft") moveStop(-1);
+  if (event.key === "ArrowDown") setDay(activeDay + 1);
+  if (event.key === "ArrowUp") setDay(activeDay - 1);
 });
 
 window.addEventListener("wheel", event => {

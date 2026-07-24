@@ -305,47 +305,12 @@ body.intro-open .transport-card {
   pointer-events: none;
 }
 
-.arrival-route-map {
-  position: absolute;
-  z-index: 12;
-  inset: 24px;
-  display: grid;
-  place-items: center;
-  overflow: hidden;
-  border: 1px solid rgba(255,255,255,.24);
-  border-radius: 26px;
-  background: #d7dcdd;
-  box-shadow: 0 28px 80px rgba(0,0,0,.32);
-  opacity: 0;
-  visibility: hidden;
-  transform: scale(.98);
-  transition: opacity .45s ease, transform .65s ease, visibility .45s ease;
-}
+body.arrival-globe-mode .terrain-photo-strip { display: none; }
 
-.arrival-route-map img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
+body.arrival-globe-mode .route-legend span:not(:last-child) { display: none; }
 
-body.arrival-map-mode .arrival-route-map {
-  opacity: 1;
-  visibility: visible;
-  transform: scale(1);
-}
-
-body.arrival-map-mode .terrain-canvas,
-body.arrival-map-mode .terrain-vignette,
-body.arrival-map-mode .terrain-sidecar,
-body.arrival-map-mode .route-legend,
-body.arrival-map-mode .terrain-controls-hint,
-body.arrival-map-mode .terrain-source,
-body.arrival-map-mode .region-legend,
-body.arrival-map-mode .transport-card,
-body.arrival-map-mode .scene-index {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
+body.arrival-globe-mode .flight-line-3d {
+  background: repeating-linear-gradient(90deg, #ffb04f 0 8px, transparent 8px 13px);
 }
 
 .terrain-sidecar {
@@ -1478,11 +1443,6 @@ body.terrain-mode .step-controls { display: none; }
   }
 
   .terrain-sidecar { display: none; }
-
-  .arrival-route-map {
-    inset: 10px;
-    border-radius: 16px;
-  }
 
   .route-legend {
     right: 10px;

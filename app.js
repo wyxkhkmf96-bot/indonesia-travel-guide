@@ -4,7 +4,7 @@ const days = [
     title: "抵达东爪哇",
     short: "泗水",
     route: "上海浦东 → 短转机 → 泗水机场 → 市区酒店",
-    main: "落地、休息、准备 Java 段",
+    main: "落地、休息、准备东爪哇行程",
     accent: "#ff7867",
     coord: [112.75, -7.25],
     place: "SURABAYA · 7.3°S 112.8°E",
@@ -24,7 +24,7 @@ const days = [
     schedule: [
       ["上午", "上海浦东出发", "一次短转机，行李直挂；目标转机 2—4 小时、总时长 10—14 小时。"],
       ["16:00—20:00", "抵达泗水", "入境、取行李、少量取现，司机在到达厅举牌接机。"],
-      ["落地后 90min", "入住，不再赶路", "酒店吃熟食，确认第二天 07:00 Java 包车。"],
+      ["落地后 90min", "入住，不再赶路", "酒店吃熟食，确认第二天 07:00 东爪哇包车。"],
       ["22:30 前", "整理瀑布装备", "防滑鞋、速干衣和防水袋单独装小包。"]
     ],
     hotel: ["Mövenpick Surabaya City", "到达日优先睡眠和接车便利，不追求景区氛围。", "约 ¥900—1,400", "备选：Four Points by Sheraton Surabaya, Pakuwon Indah"],
@@ -41,7 +41,7 @@ const days = [
     coord: [112.92, -8.23],
     place: "TUMPAK SEWU · 8.2°S 112.9°E",
     zoom: 30,
-    transport: { icon: "🚐", mode: "road", label: "JAVA 包车", detail: "泗水 → 赛武瀑布" },
+    transport: { icon: "🚐", mode: "road", label: "东爪哇包车", detail: "泗水 → 赛武瀑布" },
     region: "java",
     terrainStops: [
       { coord: [112.75, -7.25], mode: "road" },
@@ -841,7 +841,7 @@ function buildControls() {
 }
 
 function updateContent(day) {
-  document.body.classList.toggle("arrival-map-mode", activeDay === 0);
+  document.body.classList.toggle("arrival-globe-mode", activeDay === 0);
   elements.date.textContent = day.date;
   elements.title.textContent = day.title;
   elements.route.textContent = day.route;
@@ -852,8 +852,11 @@ function updateContent(day) {
   elements.secondary.src = day.photos[1][0];
   elements.secondary.alt = day.photos[1][2];
   elements.secondaryCaption.textContent = day.photos[1][1];
-  elements.terrainStopKey.innerHTML = day.schedule.map((item, index) => `
-    <li><b>${String(index + 1).padStart(2, "0")}</b><span>${item[1]}</span></li>
+  const terrainStops = activeDay === 0
+    ? ["上海浦东机场 · PVG", "泗水朱安达机场 · SUB"]
+    : day.schedule.map(item => item[1]);
+  elements.terrainStopKey.innerHTML = terrainStops.map((label, index) => `
+    <li><b>${String(index + 1).padStart(2, "0")}</b><span>${label}</span></li>
   `).join("");
   elements.terrainPhotoA.src = day.photos[0][0];
   elements.terrainPhotoA.alt = day.photos[0][2];

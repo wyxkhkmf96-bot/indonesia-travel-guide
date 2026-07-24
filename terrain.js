@@ -175,9 +175,10 @@ class TerrainStage {
       return response.json();
     });
     const countries = window.topojson.feature(world, world.objects.countries).features;
+    this.land = window.topojson.feature(world, world.objects.land);
     this.indonesia = countries.find(feature => feature.properties?.name === "Indonesia");
     this.worldReady = true;
-    this.setProgress(30, "正在生成东爪哇地形");
+    this.setProgress(30, "正在生成亚太微缩地球");
     await this.setDay(0, { instant: true });
     this.setProgress(100, "3D 沙盘准备完成");
     window.setTimeout(() => document.querySelector("#terrain-loading")?.classList.add("ready"), 350);
@@ -191,7 +192,10 @@ class TerrainStage {
     this.renderer.setSize(rect.width, rect.height, false);
     this.camera.aspect = rect.width / rect.height;
     this.camera.updateProjectionMatrix();
-    if (this.worldReady && this.currentRegion && !this.moving) this.focusOverview(true, false);
+    if (this.worldReady && this.currentRegion && !this.moving) {
+      if (this.currentRegion === "arrival") this.focusArrivalGlobe(true, false);
+      else this.focusOverview(true, false);
+    }
   }
 
   setupInteraction() {
@@ -273,6 +277,269 @@ class TerrainStage {
         object.material?.map?.dispose?.();
       });
     }
+  }
+
+  arrivalPoint(coordinate, radius = 14) {
+    const longitude = THREE.MathUtils.degToRad(coordinate[0] - 105);
+    const latitude = THREE.MathUtils.degToRad(coordinate[1]);
+    const cosLatitude = Math.cos(latitude);
+    return new THREE.Vector3(
+      radius * cosLatitude * Math.sin(longitude),
+      radius * Math.sin(latitude),
+      radius * cosLatitude * Math.cos(longitude)
+    );
+  }
+
+  createCloud(scale = 1) {
+    const cloud = new THREE.Group();
+    const material = new THREE.MeshStandardMaterial({
+      color: 0xfffbeb,
+      roughness: .92,
+      metalness: 0
+    });
+    [
+      [-.42, .02, 0, .42],
+      [0, .16, 0, .58],
+      [.48, .02, 0, .38],
+      [.08, -.08, .16, .46]
+    ].forEach(([x, y, z, size]) => {
+      const puff = new THREE.Mesh(new THREE.SphereGeometry(size * scale, 18, 12), material);
+      puff.position.set(x * scale, y * scale, z * scale);
+      puff.castShadow = true;
+      cloud.add(puff);
+    });
+    return cloud;
+  }
+
+  createArrivalMountain(coordinate, color, scale = 1) {
+    const group = new THREE.Group();
+    const base = new THREE.Mesh(
+      new THREE.ConeGeometry(.42 * scale, 1.15 * scale, 8),
+      new THREE.MeshStandardMaterial({ color, roughness: .9, flatShading: true })
+    );
+    base.position.y = .5 * scale;
+    const snow = new THREE.Mesh(
+      new THREE.ConeGeometry(.18 * scale, .38 * scale, 8),
+      new THREE.MeshStandardMaterial({ color: 0xfff8e9, roughness: .82, flatShading: true })
+    );
+    snow.position.y = 1.04 * scale;
+    group.add(base, snow);
+    const point = this.arrivalPoint(coordinate, 14.08);
+    group.position.copy(point);
+    group.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), point.clone().normalize());
+    return group;
+  }
+
+  createArrivalMarker(coordinate, number, accent) {
+    const group = new THREE.Group();
+    const stem = new THREE.Mesh(
+      new THREE.CylinderGeometry(.08, .1, .62, 12),
+      new THREE.MeshStandardMaterial({ color: accent, roughness: .5 })
+    );
+    stem.position.y = .31;
+    const head = new THREE.Mesh(
+      new THREE.SphereGeometry(.25, 18, 12),
+      new THREE.MeshStandardMaterial({ color: 0xfff8e8, roughness: .4 })
+    );
+    head.position.y = .7;
+    group.add(stem, head);
+
+    const canvas = document.createElement("canvas");
+    canvas.width = 128;
+    canvas.height = 128;
+    const context = canvas.getContext("2d");
+    context.fillStyle = "#fff8e8";
+    context.beginPath();
+    context.arc(64, 64, 52, 0, Math.PI * 2);
+    context.fill();
+    context.strokeStyle = `#${accent.toString(16).padStart(6, "0")}`;
+    context.lineWidth = 10;
+    context.stroke();
+    context.fillStyle = "#12332e";
+    context.font = "800 56px sans-serif";
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    context.fillText(String(number).padStart(2, "0"), 64, 67);
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    const badge = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: texture,
+      transparent: true,
+      depthTest: false,
+      depthWrite: false
+    }));
+    badge.position.set(number === 1 ? -.32 : .32, 1.16, 0);
+    badge.scale.set(.72, .72, 1);
+    badge.renderOrder = 25;
+    group.add(badge);
+
+    const point = this.arrivalPoint(coordinate, 14.38);
+    group.position.copy(point);
+    group.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), point.clone().normalize());
+    return group;
+  }
+
+  orientArrivalVehicle(vehicle, tangent, point) {
+    const up = point.clone().normalize();
+    const forward = tangent.clone().projectOnPlane(up).normalize();
+    const side = forward.clone().cross(up).normalize();
+    const correctedUp = side.clone().cross(forward).normalize();
+    vehicle.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(forward, correctedUp, side));
+  }
+
+  async buildArrivalGlobe() {
+    this.currentRegion = "arrival";
+    document.querySelector("#terrain-loading")?.classList.remove("ready");
+    this.setProgress(36, "正在生成亚太微缩地球");
+    await new Promise(resolve => requestAnimationFrame(resolve));
+    this.disposeGroup(this.worldGroup);
+    this.disposeGroup(this.routeGroup);
+
+    const ocean = new THREE.Mesh(
+      new THREE.SphereGeometry(14, 128, 96),
+      new THREE.MeshPhysicalMaterial({
+        color: 0x43a9b4,
+        roughness: .34,
+        clearcoat: .48,
+        clearcoatRoughness: .32
+      })
+    );
+    ocean.receiveShadow = true;
+    this.worldGroup.add(ocean);
+
+    const grid = new THREE.Mesh(
+      new THREE.SphereGeometry(14.05, 48, 32),
+      new THREE.MeshBasicMaterial({
+        color: 0xd2fff3,
+        wireframe: true,
+        transparent: true,
+        opacity: .055,
+        depthWrite: false
+      })
+    );
+    this.worldGroup.add(grid);
+
+    const landCoordinates = [];
+    for (let latitude = -55; latitude <= 70; latitude += 2) {
+      for (let longitude = 18; longitude <= 182; longitude += 2) {
+        if (window.d3.geoContains(this.land, [longitude, latitude])) {
+          landCoordinates.push([longitude, latitude]);
+        }
+      }
+    }
+    const tileGeometry = new THREE.CircleGeometry(.265, 7);
+    const landTiles = new THREE.InstancedMesh(
+      tileGeometry,
+      new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: .88, metalness: 0 }),
+      landCoordinates.length
+    );
+    const palette = [0xdbe989, 0xf2bd9e, 0xb9d99a, 0xf2d889, 0xcdb9e8];
+    const matrix = new THREE.Matrix4();
+    const quaternion = new THREE.Quaternion();
+    const scale = new THREE.Vector3(1, 1, 1);
+    landCoordinates.forEach((coordinate, index) => {
+      const point = this.arrivalPoint(coordinate, 14.13);
+      quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), point.clone().normalize());
+      matrix.compose(point, quaternion, scale);
+      landTiles.setMatrixAt(index, matrix);
+      const paletteIndex = Math.abs(Math.floor(coordinate[0] / 24) + Math.floor(coordinate[1] / 18)) % palette.length;
+      landTiles.setColorAt(index, new THREE.Color(palette[paletteIndex]));
+    });
+    landTiles.instanceMatrix.needsUpdate = true;
+    if (landTiles.instanceColor) landTiles.instanceColor.needsUpdate = true;
+    landTiles.castShadow = true;
+    landTiles.receiveShadow = true;
+    this.worldGroup.add(landTiles);
+
+    [
+      [[86, 30], 0xb89b72, 1.2],
+      [[138, 36], 0x7ba36c, .72],
+      [[113, -8], 0x6d9565, .82],
+      [[147, -6], 0x7a9f69, .7]
+    ].forEach(([coordinate, color, mountainScale]) => {
+      this.worldGroup.add(this.createArrivalMountain(coordinate, color, mountainScale));
+    });
+
+    [
+      [[54, 8], 1.05],
+      [[151, 21], .9],
+      [[128, -31], .82],
+      [[75, -37], .7]
+    ].forEach(([coordinate, cloudScale]) => {
+      const cloud = this.createCloud(cloudScale);
+      const point = this.arrivalPoint(coordinate, 15.1);
+      cloud.position.copy(point);
+      cloud.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), point.clone().normalize());
+      this.worldGroup.add(cloud);
+    });
+
+    const atmosphere = new THREE.Mesh(
+      new THREE.SphereGeometry(14.42, 96, 64),
+      new THREE.MeshBasicMaterial({
+        color: 0x8cecf0,
+        side: THREE.BackSide,
+        transparent: true,
+        opacity: .13,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      })
+    );
+    this.worldGroup.add(atmosphere);
+    this.setProgress(76, "正在绘制上海至泗水航线");
+  }
+
+  buildArrivalRoute() {
+    this.disposeGroup(this.routeGroup);
+    const start = this.arrivalPoint([121.81, 31.15], 1).normalize();
+    const end = this.arrivalPoint([112.79, -7.38], 1).normalize();
+    const axis = start.clone().cross(end).normalize();
+    const angle = start.angleTo(end);
+    const points = [];
+    for (let index = 0; index <= 80; index += 1) {
+      const t = index / 80;
+      const radius = 14.52 + Math.sin(Math.PI * t) * 2.45;
+      points.push(start.clone().applyAxisAngle(axis, angle * t).multiplyScalar(radius));
+    }
+    const curve = new THREE.CatmullRomCurve3(points);
+    const route = new THREE.Mesh(
+      new THREE.TubeGeometry(curve, 96, .095, 8, false),
+      new THREE.MeshStandardMaterial({
+        color: 0xffb04f,
+        emissive: 0xff8844,
+        emissiveIntensity: .28,
+        roughness: .45
+      })
+    );
+    this.routeGroup.add(route);
+    this.routeGroup.add(
+      this.createArrivalMarker([121.81, 31.15], 1, 0xff7867),
+      this.createArrivalMarker([112.79, -7.38], 2, 0xff7867)
+    );
+    const plane = this.createPlane(0xffb04f);
+    const planePoint = curve.getPoint(.58);
+    const tangent = curve.getTangent(.585);
+    plane.position.copy(planePoint);
+    plane.scale.multiplyScalar(.92);
+    this.orientArrivalVehicle(plane, tangent, planePoint);
+    this.routeGroup.add(plane);
+  }
+
+  focusArrivalGlobe(instant = false, resetInteraction = true) {
+    const target = new THREE.Vector3(0, 0, 0);
+    const distance = this.camera.aspect < .8 ? 55 : 48;
+    const position = new THREE.Vector3(0, 3.2, distance);
+    if (resetInteraction) this.resetUserView();
+    this.baseCameraPosition = position.clone();
+    this.baseCameraTarget = target.clone();
+    if (!resetInteraction && (
+      this.userView.zoom !== 1 ||
+      this.userView.yaw !== 0 ||
+      this.userView.pitch !== 0
+    )) {
+      this.applyUserView();
+      return;
+    }
+    this.setCameraTween(position, target, instant ? 1 : 1450);
   }
 
   regionScale(config) {
@@ -546,6 +813,18 @@ class TerrainStage {
         this.alignToSurface(tree, point);
         this.worldGroup.add(tree);
       }
+    });
+
+    const [minLon, maxLon, minLat, maxLat] = config.bounds;
+    [
+      [minLon + (maxLon - minLon) * .2, minLat + (maxLat - minLat) * .26],
+      [minLon + (maxLon - minLon) * .78, minLat + (maxLat - minLat) * .7]
+    ].forEach((coordinate, index) => {
+      const cloud = this.createCloud(index ? .62 : .76);
+      const point = this.surfacePoint(coordinate, 3.15 + index * .4, config);
+      cloud.position.copy(point);
+      this.alignToSurface(cloud, point);
+      this.worldGroup.add(cloud);
     });
 
     this.worldGroup.rotation.y = 0;
@@ -1049,6 +1328,10 @@ class TerrainStage {
   }
 
   focusOverview(instant = false, resetInteraction = true) {
+    if (this.currentRegion === "arrival") {
+      this.focusArrivalGlobe(instant, resetInteraction);
+      return;
+    }
     const day = this.itinerary[this.dayIndex];
     const visibleEntries = this.visibleTerrainEntries(day);
     const localPoints = visibleEntries.map(({ stop }) => this.toLocal(stop.coord));
@@ -1111,12 +1394,20 @@ class TerrainStage {
     this.motion = null;
     this.moving = false;
     const day = this.itinerary[index];
-    const regionChanged = this.currentRegion !== day.region;
+    const targetRegion = index === 0 ? "arrival" : day.region;
+    const regionChanged = this.currentRegion !== targetRegion;
     this.dayIndex = index;
     this.stepIndex = 0;
-    if (regionChanged) await this.buildRegion(day.region);
     this.disposeGroup(this.detailGroup);
     this.vehicle = null;
+    if (index === 0) {
+      if (regionChanged) await this.buildArrivalGlobe();
+      this.buildArrivalRoute();
+      this.focusArrivalGlobe(options.instant);
+      document.querySelector("#terrain-loading")?.classList.add("ready");
+      return { regionChanged };
+    }
+    if (regionChanged) await this.buildRegion(day.region);
     this.buildDayRoute(day);
     this.labelSprites.forEach(label => { label.visible = true; });
     this.focusOverview(options.instant);

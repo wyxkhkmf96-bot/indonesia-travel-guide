@@ -5,10 +5,11 @@ const days = [
     short: "泗水",
     route: "上海浦东 → 短转机 → 泗水机场 → 市区酒店",
     main: "落地、休息、准备 Java 段",
-    accent: "#f27052",
+    accent: "#ff7867",
     coord: [112.75, -7.25],
     place: "SURABAYA · 7.3°S 112.8°E",
-    zoom: 6.2,
+    zoom: 18,
+    transport: { icon: "✈", mode: "flight", label: "国际航班", detail: "上海 → 泗水" },
     photos: [
       ["assets/indonesia/bromo.jpg", "EAST JAVA · 抵达火山岛", "东爪哇火山景观"],
       ["assets/maps/daily/day-01.jpg", "DAY 01 ROUTE", "第一天飞抵泗水路线地图"]
@@ -29,10 +30,11 @@ const days = [
     short: "赛武",
     route: "泗水 → Tumpak Sewu → Kapas Biru → 布罗莫",
     main: "观景台 + 峡谷徒步 + 双瀑布",
-    accent: "#80c68e",
+    accent: "#ff7867",
     coord: [112.92, -8.23],
     place: "TUMPAK SEWU · 8.2°S 112.9°E",
-    zoom: 10.5,
+    zoom: 30,
+    transport: { icon: "🚐", mode: "road", label: "JAVA 包车", detail: "泗水 → 赛武瀑布" },
     photos: [
       ["assets/indonesia/scenes/tumpak-sewu.jpg", "TUMPAK SEWU · 环形水帘", "赛武瀑布环形水帘"],
       ["assets/indonesia/scenes/kapas-biru.jpg", "KAPAS BIRU · 密林高瀑", "Kapas Biru蓝棉瀑布"]
@@ -53,10 +55,11 @@ const days = [
     short: "布罗莫",
     route: "火山观景台 → 沙海 → 火山口 → 外南梦",
     main: "吉普穿越、沙海、火山口徒步",
-    accent: "#e5a756",
+    accent: "#ff7867",
     coord: [112.95, -7.94],
     place: "MOUNT BROMO · 7.9°S 113.0°E",
-    zoom: 10.5,
+    zoom: 30,
+    transport: { icon: "🛻", mode: "road", label: "包车 + 火山吉普", detail: "赛武 → 布罗莫 → 外南梦" },
     photos: [
       ["assets/indonesia/scenes/bromo-sunrise.jpg", "BROMO · 火山晨光", "布罗莫火山晨光"],
       ["assets/indonesia/scenes/bromo-sea-of-sand.jpg", "SEA OF SAND · 吉普穿越", "布罗莫沙海吉普车"]
@@ -77,10 +80,11 @@ const days = [
     short: "伊真",
     route: "外南梦 → 伊真 → 吉打邦 → 吉利马努克 → 洛维纳",
     main: "蓝火、火山湖、轮渡穿越",
-    accent: "#59a8f2",
+    accent: "#ff7867",
     coord: [114.24, -8.06],
     place: "IJEN CRATER · 8.1°S 114.2°E",
-    zoom: 11.5,
+    zoom: 31,
+    transport: { icon: "⛴", mode: "boat", label: "徒步 + 轮渡 + 包车", detail: "伊真 → 巴厘岛西部" },
     photos: [
       ["assets/indonesia/scenes/ijen-blue-fire.jpg", "IJEN · 蓝色火焰", "伊真火山蓝火"],
       ["assets/indonesia/scenes/ijen-crater.jpg", "CRATER LAKE · 火山湖", "伊真火山湖"]
@@ -104,7 +108,8 @@ const days = [
     accent: "#d8ef76",
     coord: [115.35, -8.24],
     place: "KINTAMANI · 8.2°S 115.4°E",
-    zoom: 14,
+    zoom: 38,
+    transport: { icon: "🚐", mode: "road", label: "巴厘岛包车", detail: "洛维纳 → 金塔马尼 → 乌布" },
     photos: [
       ["assets/indonesia/scenes/kintamani-akasa-lunch.jpg", "AKASA · 巴图尔火山午餐", "金塔马尼巴图尔火山景观餐厅"],
       ["assets/indonesia/scenes/leke-leke-pexels-v2.jpg", "LEKE LEKE · 雨林瀑布", "Leke Leke雨林瀑布"]
@@ -125,10 +130,11 @@ const days = [
     short: "乌布",
     route: "乌布 → ATV 山谷 → Saba 黑沙滩 → 乌布",
     main: "ATV、黑沙滩、SPA",
-    accent: "#f2a65a",
+    accent: "#d8ef76",
     coord: [115.26, -8.51],
     place: "UBUD · 8.5°S 115.3°E",
-    zoom: 15.5,
+    zoom: 42,
+    transport: { icon: "🏍", mode: "road", label: "包车 + ATV", detail: "乌布山谷 → Saba 海岸" },
     photos: [
       ["assets/indonesia/scenes/ubud-valley.jpg", "UBUD · 山谷越野", "乌布山谷景观"],
       ["assets/indonesia/scenes/saba-beach.jpg", "SABA · 黑沙海岸", "Saba黑沙滩"]
@@ -149,10 +155,11 @@ const days = [
     short: "佩尼达",
     route: "乌布 → Sanur → Nusa Penida 西线 → Sanur",
     main: "精灵坠崖、Broken Beach、可控浮潜",
-    accent: "#49c3c0",
+    accent: "#d8ef76",
     coord: [115.55, -8.73],
     place: "NUSA PENIDA · 8.7°S 115.6°E",
-    zoom: 14.5,
+    zoom: 39,
+    transport: { icon: "⛴", mode: "boat", label: "接驳车 + 快船", detail: "Sanur ⇄ 佩尼达岛" },
     photos: [
       ["assets/indonesia/scenes/kelingking.jpg", "KELINGKING · 精灵坠崖", "佩尼达岛精灵坠崖"],
       ["assets/indonesia/scenes/broken-beach.jpg", "BROKEN BEACH · 海蚀拱门", "佩尼达岛破碎沙滩"]
@@ -173,10 +180,11 @@ const days = [
     short: "拉布安巴焦",
     route: "Sanur → 登巴萨机场 → Labuan Bajo",
     main: "境内飞行、海湾日落、确认船期",
-    accent: "#e57d63",
+    accent: "#c3a7ff",
     coord: [119.88, -8.50],
     place: "LABUAN BAJO · 8.5°S 119.9°E",
-    zoom: 11,
+    zoom: 27,
+    transport: { icon: "✈", mode: "flight", label: "境内航班", detail: "巴厘岛 → 拉布安巴焦" },
     photos: [
       ["assets/indonesia/scenes/labuan-bajo.jpg", "LABUAN BAJO · 海湾日落", "拉布安巴焦海湾"],
       ["assets/maps/daily/day-08.jpg", "DAY 08 ROUTE", "巴厘岛飞往拉布安巴焦路线地图"]
@@ -197,10 +205,11 @@ const days = [
     short: "科莫多",
     route: "Labuan Bajo → Padar → Pink Beach → Komodo → Taka / Manta",
     main: "火山地貌、粉色沙滩、科莫多龙、浮潜",
-    accent: "#f38b8e",
+    accent: "#c3a7ff",
     coord: [119.58, -8.65],
     place: "KOMODO · 8.7°S 119.6°E",
-    zoom: 13.5,
+    zoom: 34,
+    transport: { icon: "🚤", mode: "boat", label: "科莫多快艇", detail: "Padar → Pink Beach → Komodo" },
     photos: [
       ["assets/indonesia/padar.jpg", "PADAR · 火山海湾", "帕达尔岛火山海湾"],
       ["assets/indonesia/pink_beach.jpg", "PINK BEACH · 粉色海岸", "科莫多粉色沙滩"]
@@ -221,10 +230,11 @@ const days = [
     short: "回家",
     route: "Labuan Bajo → Singapore → Shanghai Pudong",
     main: "开口返程，不走回头路",
-    accent: "#d8ef76",
+    accent: "#95c9be",
     coord: [103.82, 1.35],
     place: "SINGAPORE · 1.4°N 103.8°E",
     zoom: 1.55,
+    transport: { icon: "✈", mode: "flight", label: "国际联程航班", detail: "科莫多 → 新加坡 → 上海" },
     photos: [
       ["assets/indonesia/scenes/labuan-bajo.jpg", "FAREWELL · 海湾清晨", "拉布安巴焦海湾清晨"],
       ["assets/maps/daily/day-10.jpg", "OPEN-JAW ROUTE · 直接回家", "科莫多经新加坡回上海路线地图"]
@@ -239,6 +249,23 @@ const days = [
     notice: "只选择同一订单的通程机票。若必须分票，需重新入境、取行李和托运，不建议用短转机冒险。",
     cost: ["¥300—600", "送机与餐饮；国际机票另计"]
   }
+];
+
+const terrainFeatures = [
+  { label: "赛武瀑布", type: "waterfall", coord: [112.92, -8.23], days: [1], side: "right" },
+  { label: "塞梅鲁火山", type: "mountain", coord: [112.92, -8.11], days: [1, 2], side: "left" },
+  { label: "布罗莫火山", type: "volcano", coord: [112.95, -7.94], days: [2], side: "right" },
+  { label: "伊真火山湖", type: "volcano", coord: [114.24, -8.06], days: [3], side: "right" },
+  { label: "巴图尔火山", type: "volcano", coord: [115.38, -8.24], days: [4, 5], side: "right" },
+  { label: "Leke Leke 瀑布", type: "waterfall", coord: [115.30, -8.33], days: [4], side: "left" },
+  { label: "乌布山谷", type: "valley", coord: [115.26, -8.51], days: [4, 5], side: "left" },
+  { label: "Saba 黑沙滩", type: "beach", coord: [115.32, -8.62], days: [5], side: "right" },
+  { label: "精灵坠崖", type: "cliff", coord: [115.45, -8.75], days: [6], side: "left" },
+  { label: "Broken Beach", type: "beach", coord: [115.45, -8.73], days: [6], side: "right" },
+  { label: "拉布安巴焦海湾", type: "beach", coord: [119.88, -8.50], days: [7, 8], side: "right" },
+  { label: "Padar 火山山脊", type: "mountain", coord: [119.57, -8.65], days: [8], side: "left" },
+  { label: "Pink Beach", type: "beach", coord: [119.55, -8.54], days: [8], side: "left" },
+  { label: "Manta Point", type: "reef", coord: [119.61, -8.53], days: [8], side: "right" }
 ];
 
 class CuteGlobe {
@@ -283,6 +310,19 @@ class CuteGlobe {
         return response.json();
       });
       this.features = topojson.feature(world, world.objects.countries).features;
+      this.features.forEach(feature => {
+        feature._center = d3.geoCentroid(feature);
+        if (feature.properties?.name === "Indonesia" && feature.geometry.type === "MultiPolygon") {
+          feature._islands = feature.geometry.coordinates.map(coordinates => {
+            const island = {
+              type: "Feature",
+              properties: {},
+              geometry: { type: "Polygon", coordinates }
+            };
+            return { feature: island, center: d3.geoCentroid(island) };
+          });
+        }
+      });
       this.mesh = topojson.mesh(world, world.objects.countries, (a, b) => a !== b);
       this.canvas.classList.add("globe-ready");
       this.draw();
@@ -334,9 +374,40 @@ class CuteGlobe {
 
   colorFor(feature) {
     const name = feature.properties?.name || "";
-    if (name === "Indonesia") return "#d8ef76";
     const seed = String(feature.id || name).split("").reduce((sum, char) => sum + char.charCodeAt(0), 0);
     return this.palette[seed % this.palette.length];
+  }
+
+  regionColorForLongitude(longitude) {
+    if (longitude >= 105 && longitude < 114.8) return "#ff7867";
+    if (longitude >= 114.8 && longitude < 116.2) return "#d8ef76";
+    if (longitude >= 116.2 && longitude < 122.5) return "#c3a7ff";
+    return "#f5d889";
+  }
+
+  drawCountry(feature) {
+    const name = feature.properties?.name || "";
+    if (name !== "Indonesia" || feature.geometry.type !== "MultiPolygon") {
+      this.ctx.beginPath();
+      this.path(feature);
+      this.ctx.fillStyle = this.colorFor(feature);
+      this.ctx.fill();
+      return;
+    }
+
+    const center = [-this.rotation[0], -this.rotation[1]];
+    const islands = feature._islands || [];
+    islands.forEach(island => {
+      if (this.zoom > 4 && d3.geoDistance(island.center, center) > .34) return;
+      const longitude = island.center[0];
+      this.ctx.beginPath();
+      this.path(island.feature);
+      this.ctx.fillStyle = this.regionColorForLongitude(longitude);
+      this.ctx.fill();
+      this.ctx.strokeStyle = "rgba(255,255,255,.55)";
+      this.ctx.lineWidth = .7;
+      this.ctx.stroke();
+    });
   }
 
   isVisible(coordinate) {
@@ -357,6 +428,124 @@ class CuteGlobe {
     this.ctx.setLineDash([]);
   }
 
+  roundedRect(x, y, width, height, radius) {
+    const ctx = this.ctx;
+    const r = Math.min(radius, width / 2, height / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + width - r, y);
+    ctx.quadraticCurveTo(x + width, y, x + width, y + r);
+    ctx.lineTo(x + width, y + height - r);
+    ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
+    ctx.lineTo(x + r, y + height);
+    ctx.quadraticCurveTo(x, y + height, x, y + height - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  }
+
+  drawTerrainFeature(feature) {
+    if (!feature.days.includes(this.active) || this.zoom < 8 || !this.isVisible(feature.coord)) return;
+    const point = this.projection(feature.coord);
+    if (!point) return;
+    const [x, y] = point;
+    const ctx = this.ctx;
+    const accent = this.regionColorForLongitude(feature.coord[0]);
+
+    ctx.save();
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
+
+    if (feature.type === "mountain" || feature.type === "volcano") {
+      ctx.beginPath();
+      ctx.moveTo(x - 9, y + 7);
+      ctx.lineTo(x, y - 10);
+      ctx.lineTo(x + 10, y + 7);
+      ctx.closePath();
+      ctx.fillStyle = feature.type === "volcano" ? "#8b604e" : "#66855d";
+      ctx.fill();
+      ctx.strokeStyle = "#fffaf0";
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+      if (feature.type === "volcano") {
+        ctx.beginPath();
+        ctx.moveTo(x - 3, y - 5);
+        ctx.quadraticCurveTo(x, y - 2, x + 3, y - 5);
+        ctx.strokeStyle = "#ff7867";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+    } else if (feature.type === "beach") {
+      ctx.beginPath();
+      ctx.arc(x, y, 8, -.9, 2.2);
+      ctx.strokeStyle = "#ffe49b";
+      ctx.lineWidth = 5;
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(x + 2, y + 1, 9, -.8, 2.15);
+      ctx.strokeStyle = "#72d3d0";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    } else if (feature.type === "waterfall") {
+      ctx.beginPath();
+      ctx.moveTo(x - 4, y - 8);
+      ctx.quadraticCurveTo(x - 7, y + 1, x - 2, y + 7);
+      ctx.moveTo(x + 3, y - 8);
+      ctx.quadraticCurveTo(x, y + 1, x + 5, y + 7);
+      ctx.strokeStyle = "#8fe1f2";
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+    } else if (feature.type === "cliff") {
+      ctx.beginPath();
+      ctx.moveTo(x - 7, y - 7);
+      ctx.lineTo(x + 7, y - 4);
+      ctx.lineTo(x + 2, y + 7);
+      ctx.lineTo(x - 4, y + 2);
+      ctx.closePath();
+      ctx.fillStyle = "#e19a6e";
+      ctx.fill();
+      ctx.strokeStyle = "#fffaf0";
+      ctx.lineWidth = 1.1;
+      ctx.stroke();
+    } else if (feature.type === "reef") {
+      ctx.beginPath();
+      ctx.arc(x, y, 7, 0, Math.PI * 2);
+      ctx.strokeStyle = "#f4a7b9";
+      ctx.lineWidth = 3;
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(x, y, 3, 0, Math.PI * 2);
+      ctx.fillStyle = "#72d3d0";
+      ctx.fill();
+    } else {
+      ctx.beginPath();
+      ctx.arc(x, y, 8, 0, Math.PI * 2);
+      ctx.fillStyle = "#79a96a";
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(x + 5, y - 5, 4, 0, Math.PI * 2);
+      ctx.fillStyle = "#b9dc79";
+      ctx.fill();
+    }
+
+    ctx.font = "600 9px Noto Sans SC, sans-serif";
+    const textWidth = Math.ceil(ctx.measureText(feature.label).width);
+    const boxWidth = textWidth + 16;
+    const boxX = feature.side === "left" ? x - boxWidth - 15 : x + 15;
+    const boxY = y - 11;
+    this.roundedRect(boxX, boxY, boxWidth, 22, 8);
+    ctx.fillStyle = "rgba(7,31,29,.86)";
+    ctx.fill();
+    ctx.strokeStyle = accent;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.fillStyle = "#fffaf0";
+    ctx.textAlign = "left";
+    ctx.textBaseline = "middle";
+    ctx.fillText(feature.label, boxX + 8, boxY + 11);
+    ctx.restore();
+  }
+
   drawPin(coordinate, number, state) {
     if (!this.isVisible(coordinate)) return;
     const point = this.projection(coordinate);
@@ -374,7 +563,9 @@ class CuteGlobe {
 
     this.ctx.beginPath();
     this.ctx.arc(x, y, active ? 10 : 6.5, 0, Math.PI * 2);
-    this.ctx.fillStyle = active ? this.itinerary[this.active].accent : (passed ? "#d8ef76" : "#153e3a");
+    this.ctx.fillStyle = active
+      ? this.itinerary[this.active].accent
+      : (passed ? this.regionColorForLongitude(coordinate[0]) : "#153e3a");
     this.ctx.fill();
     this.ctx.strokeStyle = "#fffaf0";
     this.ctx.lineWidth = active ? 2.5 : 1.5;
@@ -414,14 +605,15 @@ class CuteGlobe {
     ctx.lineWidth = .65;
     ctx.stroke();
 
-    this.features.forEach(feature => {
-      ctx.beginPath();
-      this.path(feature);
-      ctx.fillStyle = this.colorFor(feature);
-      ctx.fill();
-    });
+    const center = [-this.rotation[0], -this.rotation[1]];
+    const visibleFeatures = this.zoom > 4
+      ? this.features.filter(feature =>
+          feature.properties?.name === "Indonesia" || d3.geoDistance(feature._center, center) < .72
+        )
+      : this.features;
+    visibleFeatures.forEach(feature => this.drawCountry(feature));
 
-    if (this.mesh) {
+    if (this.mesh && this.zoom <= 4) {
       ctx.beginPath();
       this.path(this.mesh);
       ctx.strokeStyle = "rgba(18,71,65,.32)";
@@ -436,6 +628,17 @@ class CuteGlobe {
     ];
     if (this.active === this.itinerary.length - 1) completed.push([121.47, 31.23]);
     this.strokeRoute(completed, this.itinerary[this.active].accent, 3.3);
+
+    const currentSegment = [
+      this.active === 0 ? [121.47, 31.23] : this.itinerary[this.active - 1].coord,
+      this.itinerary[this.active].coord
+    ];
+    if (this.active === this.itinerary.length - 1) currentSegment.push([121.47, 31.23]);
+    const mode = this.itinerary[this.active].transport.mode;
+    const dash = mode === "flight" ? [11, 8] : (mode === "boat" ? [2, 6] : []);
+    this.strokeRoute(currentSegment, this.itinerary[this.active].accent, 5, dash);
+
+    terrainFeatures.forEach(feature => this.drawTerrainFeature(feature));
 
     this.itinerary.forEach((day, index) => {
       const state = index === this.active ? "active" : (index < this.active ? "passed" : "future");
@@ -478,7 +681,11 @@ const elements = {
   current: document.querySelector("#scene-current"),
   rail: document.querySelector("#day-rail"),
   globeLabel: document.querySelector("#globe-location"),
-  globeView: document.querySelector("#globe-view")
+  globeView: document.querySelector("#globe-view"),
+  transportCard: document.querySelector("#transport-card"),
+  transportIcon: document.querySelector("#transport-icon"),
+  transportLabel: document.querySelector("#transport-label"),
+  transportDetail: document.querySelector("#transport-detail")
 };
 
 let activeDay = 0;
@@ -531,6 +738,12 @@ function updateStage(day) {
   document.documentElement.style.setProperty("--day-accent", day.accent);
   elements.globeLabel.textContent = overview ? "ASIA → INDONESIA" : day.place;
   elements.globeView.textContent = overview ? "WORLD VIEW · 1.0×" : `LOCAL VIEW · ${day.zoom.toFixed(1)}×`;
+  elements.transportIcon.textContent = day.transport.icon;
+  elements.transportLabel.textContent = day.transport.label;
+  elements.transportDetail.textContent = day.transport.detail;
+  elements.transportCard.classList.remove("is-moving");
+  void elements.transportCard.offsetWidth;
+  if (!overview) elements.transportCard.classList.add("is-moving");
   globe.focus(activeDay, overview, overview);
 
   [...elements.rail.children].forEach((button, index) => {

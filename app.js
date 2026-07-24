@@ -8,6 +8,7 @@ const days = [
     accent: "#f27052",
     coord: [112.75, -7.25],
     place: "SURABAYA · 7.3°S 112.8°E",
+    zoom: 6.2,
     photos: [
       ["assets/indonesia/bromo.jpg", "EAST JAVA · 抵达火山岛", "东爪哇火山景观"],
       ["assets/maps/daily/day-01.jpg", "DAY 01 ROUTE", "第一天飞抵泗水路线地图"]
@@ -31,6 +32,7 @@ const days = [
     accent: "#80c68e",
     coord: [112.92, -8.23],
     place: "TUMPAK SEWU · 8.2°S 112.9°E",
+    zoom: 10.5,
     photos: [
       ["assets/indonesia/scenes/tumpak-sewu.jpg", "TUMPAK SEWU · 环形水帘", "赛武瀑布环形水帘"],
       ["assets/indonesia/scenes/kapas-biru.jpg", "KAPAS BIRU · 密林高瀑", "Kapas Biru蓝棉瀑布"]
@@ -54,6 +56,7 @@ const days = [
     accent: "#e5a756",
     coord: [112.95, -7.94],
     place: "MOUNT BROMO · 7.9°S 113.0°E",
+    zoom: 10.5,
     photos: [
       ["assets/indonesia/scenes/bromo-sunrise.jpg", "BROMO · 火山晨光", "布罗莫火山晨光"],
       ["assets/indonesia/scenes/bromo-sea-of-sand.jpg", "SEA OF SAND · 吉普穿越", "布罗莫沙海吉普车"]
@@ -77,6 +80,7 @@ const days = [
     accent: "#59a8f2",
     coord: [114.24, -8.06],
     place: "IJEN CRATER · 8.1°S 114.2°E",
+    zoom: 11.5,
     photos: [
       ["assets/indonesia/scenes/ijen-blue-fire.jpg", "IJEN · 蓝色火焰", "伊真火山蓝火"],
       ["assets/indonesia/scenes/ijen-crater.jpg", "CRATER LAKE · 火山湖", "伊真火山湖"]
@@ -100,6 +104,7 @@ const days = [
     accent: "#d8ef76",
     coord: [115.35, -8.24],
     place: "KINTAMANI · 8.2°S 115.4°E",
+    zoom: 14,
     photos: [
       ["assets/indonesia/scenes/kintamani-akasa-lunch.jpg", "AKASA · 巴图尔火山午餐", "金塔马尼巴图尔火山景观餐厅"],
       ["assets/indonesia/scenes/leke-leke-pexels-v2.jpg", "LEKE LEKE · 雨林瀑布", "Leke Leke雨林瀑布"]
@@ -123,6 +128,7 @@ const days = [
     accent: "#f2a65a",
     coord: [115.26, -8.51],
     place: "UBUD · 8.5°S 115.3°E",
+    zoom: 15.5,
     photos: [
       ["assets/indonesia/scenes/ubud-valley.jpg", "UBUD · 山谷越野", "乌布山谷景观"],
       ["assets/indonesia/scenes/saba-beach.jpg", "SABA · 黑沙海岸", "Saba黑沙滩"]
@@ -146,6 +152,7 @@ const days = [
     accent: "#49c3c0",
     coord: [115.55, -8.73],
     place: "NUSA PENIDA · 8.7°S 115.6°E",
+    zoom: 14.5,
     photos: [
       ["assets/indonesia/scenes/kelingking.jpg", "KELINGKING · 精灵坠崖", "佩尼达岛精灵坠崖"],
       ["assets/indonesia/scenes/broken-beach.jpg", "BROKEN BEACH · 海蚀拱门", "佩尼达岛破碎沙滩"]
@@ -169,6 +176,7 @@ const days = [
     accent: "#e57d63",
     coord: [119.88, -8.50],
     place: "LABUAN BAJO · 8.5°S 119.9°E",
+    zoom: 11,
     photos: [
       ["assets/indonesia/scenes/labuan-bajo.jpg", "LABUAN BAJO · 海湾日落", "拉布安巴焦海湾"],
       ["assets/maps/daily/day-08.jpg", "DAY 08 ROUTE", "巴厘岛飞往拉布安巴焦路线地图"]
@@ -192,6 +200,7 @@ const days = [
     accent: "#f38b8e",
     coord: [119.58, -8.65],
     place: "KOMODO · 8.7°S 119.6°E",
+    zoom: 13.5,
     photos: [
       ["assets/indonesia/padar.jpg", "PADAR · 火山海湾", "帕达尔岛火山海湾"],
       ["assets/indonesia/pink_beach.jpg", "PINK BEACH · 粉色海岸", "科莫多粉色沙滩"]
@@ -215,6 +224,7 @@ const days = [
     accent: "#d8ef76",
     coord: [103.82, 1.35],
     place: "SINGAPORE · 1.4°N 103.8°E",
+    zoom: 1.55,
     photos: [
       ["assets/indonesia/scenes/labuan-bajo.jpg", "FAREWELL · 海湾清晨", "拉布安巴焦海湾清晨"],
       ["assets/maps/daily/day-10.jpg", "OPEN-JAW ROUTE · 直接回家", "科莫多经新加坡回上海路线地图"]
@@ -240,8 +250,11 @@ class CuteGlobe {
     this.rotation = [-112.75, 7.25, -7];
     this.targetRotation = [...this.rotation];
     this.startRotation = [...this.rotation];
+    this.zoom = 1;
+    this.startZoom = 1;
+    this.targetZoom = 1;
     this.tweenStart = 0;
-    this.tweenDuration = 1250;
+    this.tweenDuration = 1650;
     this.frame = null;
     this.features = [];
     this.mesh = null;
@@ -290,17 +303,19 @@ class CuteGlobe {
     this.ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
     this.projection
       .translate([rect.width / 2, rect.height / 2])
-      .scale(Math.min(rect.width, rect.height) * .405);
+      .scale(Math.min(rect.width, rect.height) * .405 * this.zoom);
     this.draw();
   }
 
-  focus(index, immediate = false) {
+  focus(index, immediate = false, overview = false) {
     this.active = index;
     const [longitude, latitude] = this.itinerary[index].coord;
     this.startRotation = [...this.rotation];
+    this.startZoom = this.zoom;
     const desired = [-longitude, -latitude, -7];
     const delta = ((desired[0] - this.startRotation[0] + 540) % 360) - 180;
     this.targetRotation = [this.startRotation[0] + delta, desired[1], desired[2]];
+    this.targetZoom = overview ? 1 : this.itinerary[index].zoom;
     this.tweenStart = performance.now() - (immediate ? this.tweenDuration : 0);
     if (this.frame) cancelAnimationFrame(this.frame);
     this.frame = requestAnimationFrame(this.animate);
@@ -312,6 +327,7 @@ class CuteGlobe {
     this.rotation = this.startRotation.map((value, index) =>
       value + (this.targetRotation[index] - value) * eased
     );
+    this.zoom = this.startZoom + (this.targetZoom - this.startZoom) * eased;
     this.draw();
     if (raw < 1) this.frame = requestAnimationFrame(this.animate);
   }
@@ -375,7 +391,9 @@ class CuteGlobe {
     if (!this.width || !this.height) return;
     const ctx = this.ctx;
     ctx.clearRect(0, 0, this.width, this.height);
-    this.projection.rotate(this.rotation);
+    this.projection
+      .rotate(this.rotation)
+      .scale(Math.min(this.width, this.height) * .405 * this.zoom);
 
     ctx.save();
     ctx.beginPath();
@@ -459,7 +477,8 @@ const elements = {
   costNote: document.querySelector("#day-cost-note"),
   current: document.querySelector("#scene-current"),
   rail: document.querySelector("#day-rail"),
-  globeLabel: document.querySelector("#globe-location")
+  globeLabel: document.querySelector("#globe-location"),
+  globeView: document.querySelector("#globe-view")
 };
 
 let activeDay = 0;
@@ -508,9 +527,11 @@ function updateContent(day) {
 }
 
 function updateStage(day) {
+  const overview = document.body.classList.contains("intro-open");
   document.documentElement.style.setProperty("--day-accent", day.accent);
-  elements.globeLabel.textContent = day.place;
-  globe.focus(activeDay, document.body.classList.contains("intro-open"));
+  elements.globeLabel.textContent = overview ? "ASIA → INDONESIA" : day.place;
+  elements.globeView.textContent = overview ? "WORLD VIEW · 1.0×" : `LOCAL VIEW · ${day.zoom.toFixed(1)}×`;
+  globe.focus(activeDay, overview, overview);
 
   [...elements.rail.children].forEach((button, index) => {
     button.classList.toggle("active", index === activeDay);
@@ -548,6 +569,9 @@ document.querySelector("#start-button").addEventListener("click", enterExperienc
 document.querySelector("#back-home").addEventListener("click", event => {
   event.preventDefault();
   document.body.classList.add("intro-open");
+  elements.globeLabel.textContent = "ASIA → INDONESIA";
+  elements.globeView.textContent = "WORLD VIEW · 1.0×";
+  globe.focus(activeDay, false, true);
 });
 
 const planning = document.querySelector("#planning");

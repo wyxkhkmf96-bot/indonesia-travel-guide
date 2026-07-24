@@ -3,499 +3,171 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="2026年9月27日至10月6日，上海出发、泗水进、科莫多出的印度尼西亚10天9晚静态逐日行程册。">
-  <meta name="theme-color" content="#173f38">
-  <meta property="og:title" content="印尼 10 天 9 晚｜逐日行程册">
-  <meta property="og:description" content="每天一张大地图和一组景点实景图，明确主要玩法、时间安排、注意事项和酒店建议。">
-  <meta property="og:image" content="https://wyxkhkmf96-bot.github.io/indonesia-travel-guide/assets/indonesia/social-cover.png">
-  <title>印尼 10 天 9 晚｜逐日行程册</title>
+  <meta name="description" content="2026年9月27日至10月6日，上海出发、泗水进、科莫多出的印度尼西亚10天9晚3D行程舞台。">
+  <meta name="theme-color" content="#071f1d">
+  <meta property="og:title" content="一路向东｜印尼 10 天 9 晚">
+  <meta property="og:description" content="沿着立体路线图，从东爪哇火山一路走到科莫多。每天的玩法、酒店、预算和注意事项都在一张行程舞台上。">
+  <meta property="og:image" content="https://wyxkhkmf96-bot.github.io/indonesia-travel-guide/assets/indonesia/social-cover-v2.png">
+  <title>一路向东｜印尼 10 天 9 晚</title>
+  <link rel="preload" as="image" href="indonesia-route-map.png">
+  <link rel="preload" as="image" href="assets/indonesia/bromo.jpg">
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
-  <header class="hero">
-    <div class="hero-image" role="img" aria-label="布罗莫火山景观"></div>
-    <div class="hero-copy">
-      <p class="eyebrow">Indonesia · 10 days / 9 nights</p>
-      <h1>每天做什么，<br><em>打开就能走。</em></h1>
-      <p class="hero-lead">这版不讲景点百科，也不需要点选。10 天行程一次全部展开：当天路线、实景种草图、主要项目、注意事项和酒店，全部放在同一页。</p>
-      <dl class="trip-facts">
-        <div><dt>日期</dt><dd>09.27—10.06</dd></div>
-        <div><dt>同行</dt><dd>3 人 · 2 间房</dd></div>
-        <div><dt>路线</dt><dd>泗水进 · 科莫多出</dd></div>
-        <div><dt>总预算</dt><dd>¥43,000—63,000</dd></div>
-      </dl>
+<body class="intro-open">
+  <div class="noise" aria-hidden="true"></div>
+
+  <section class="intro" id="intro" aria-labelledby="intro-title">
+    <div class="intro-bg" aria-hidden="true"></div>
+    <div class="intro-number" aria-hidden="true">10</div>
+    <div class="intro-copy">
+      <p class="kicker">INDONESIA · 09.27—10.06</p>
+      <h1 id="intro-title">一路向东，<br><em>直到科莫多。</em></h1>
+      <p class="intro-lead">3 人 · 2 间房 · 泗水进 / 科莫多出<br>一场火山、瀑布、悬崖与粉色海岸组成的 10 天旅程。</p>
+      <button class="start-button" id="start-button" type="button">
+        <span>进入行程</span><i aria-hidden="true">↗</i>
+      </button>
     </div>
-  </header>
+    <div class="intro-facts" aria-label="行程概要">
+      <span><b>01</b> 火山线</span>
+      <span><b>02</b> 海岛线</span>
+      <span><b>03</b> 开口航程</span>
+    </div>
+  </section>
 
-  <main>
-    <section class="route-verdict">
-      <div class="page">
-        <p class="eyebrow ink">Route verdict</p>
-        <div class="verdict-grid">
-          <h2>一路向东，<br>不回巴厘岛。</h2>
-          <div class="flight-line" aria-label="全程飞行路线">
-            <span><b>去程</b>PVG → 短转 → SUB</span>
-            <i>→</i>
-            <span><b>境内</b>DPS → LBJ</span>
-            <i>→</i>
-            <span><b>返程</b>LBJ → SIN → PVG</span>
-          </div>
-          <p>三人机票以 <strong>¥14,500—20,000</strong> 为下单区间。国际返程只买同一订单、行李直挂的联程票；如果没有合适的新加坡联程，就改经雅加达，不用分票硬压转机时间。</p>
+  <main class="experience" id="experience">
+    <header class="topbar">
+      <a class="brand" href="#intro" id="back-home" aria-label="返回封面">
+        <b>INDO</b><span>一路向东</span>
+      </a>
+      <div class="trip-meta">
+        <span>3 PEOPLE</span><i></i><span>2 ROOMS</span><i></i><span>¥43K—63K</span>
+      </div>
+      <button class="plan-button" id="plan-button" type="button">出发准备 <span>↗</span></button>
+    </header>
+
+    <section class="stage" aria-label="印尼十天行程舞台">
+      <div class="ambient ambient-a" aria-hidden="true"></div>
+      <div class="ambient ambient-b" aria-hidden="true"></div>
+
+      <div class="map-viewport" aria-hidden="true">
+        <div class="map-rig" id="map-rig">
+          <div class="map-shadow"></div>
+          <div class="map-base map-base-3"></div>
+          <div class="map-base map-base-2"></div>
+          <div class="map-base map-base-1"></div>
+          <img class="route-map" src="indonesia-route-map.png" alt="">
+          <div class="map-glow"></div>
+          <div class="route-nodes" id="route-nodes"></div>
         </div>
       </div>
-    </section>
 
-    <section class="itinerary-intro page">
-      <p class="eyebrow ink">Daily itinerary</p>
-      <h2>10 天静态行程单</h2>
-      <p>地图中的数字就是当天顺序；每张图只呈现当天活动范围。路线为规划示意，不替代现场导航。</p>
-    </section>
-
-    <article class="day page" id="day-01">
-      <header class="day-head">
-        <div class="day-number">01</div>
-        <div><p>09.27 · SUN</p><h2>抵达东爪哇</h2><span>上海浦东 → 短转机 → 泗水机场 → 市区酒店</span></div>
-        <strong>主要项目<br><em>落地、休息、准备 Java 段</em></strong>
-      </header>
-      <figure class="day-map"><img src="assets/maps/daily/day-01.jpg" alt="第1天上海飞往泗水的静态路线地图"></figure>
-      <div class="day-content">
-        <section class="schedule">
-          <h3>今天怎么走</h3>
-          <ol>
-            <li><time>上午</time><div><b>上海浦东出发</b><p>接受一次短转机，优先行李直挂；目标转机 2—4 小时、总时长 10—14 小时。</p></div></li>
-            <li><time>16:00—20:00</time><div><b>抵达泗水</b><p>入境、取行李、少量取现，预订司机在到达厅举牌接机。</p></div></li>
-            <li><time>落地后 90min</time><div><b>入住，不再赶路</b><p>酒店附近吃熟食，和 Java 包车方确认第二天 07:00 接车。</p></div></li>
-            <li><time>22:30 前</time><div><b>整理瀑布装备</b><p>防滑鞋、速干衣和防水袋单独装小包，主箱第二天留车上。</p></div></li>
-          </ol>
-        </section>
-        <aside class="day-side">
-          <div class="hotel">
-            <span>今晚住 · 两间房</span>
-            <h3>Mövenpick Surabaya City</h3>
-            <p>到达日优先睡眠和接车便利，不追求景区氛围。</p>
-            <b>约 ¥900—1,400</b>
-            <small>备选：Four Points by Sheraton Surabaya, Pakuwon Indah</small>
-          </div>
-          <div class="notice"><span>当天注意</span><p>只买一张联程票。落地延误也不要继续赶四小时山路；泗水过夜是为了把第二天瀑布体力留足。</p></div>
-          <div class="day-cost"><span>3 人当日预算</span><b>¥1,100—1,800</b><small>接机、餐饮与两间房</small></div>
-        </aside>
+      <div class="scene-index" aria-hidden="true">
+        <span id="scene-current">01</span><i></i><span>10</span>
       </div>
-    </article>
 
-    <article class="day page" id="day-02">
-      <header class="day-head">
-        <div class="day-number">02</div>
-        <div><p>09.28 · MON</p><h2>赛武瀑布大日</h2><span>泗水 → Tumpak Sewu → Blue Cotton → 布罗莫</span></div>
-        <strong>主要项目<br><em>观景台 + 峡谷徒步 + 瀑布群</em></strong>
-      </header>
-      <figure class="day-map"><img src="assets/maps/daily/day-02.jpg" alt="第2天泗水至赛武瀑布和布罗莫的静态路线地图" loading="lazy"></figure>
-      <section class="scenes" aria-label="第2天景点实景照片">
-        <div class="scenes-title"><b>今天会看到什么</b><span>瀑布双主角</span></div>
-        <div class="scene-grid two">
-          <figure class="scene-card">
-            <img src="assets/indonesia/scenes/tumpak-sewu.jpg" alt="赛武瀑布环形水帘实景" loading="lazy">
-            <figcaption><div><b>Tumpak Sewu · 赛武瀑布</b><span>站在峡谷里，被整面水帘包围</span></div><a href="https://commons.wikimedia.org/wiki/File:Air_Terjun_Tumpak_Sewu.jpg">图源 ↗</a></figcaption>
-          </figure>
-          <figure class="scene-card">
-            <img src="assets/indonesia/scenes/kapas-biru.jpg" alt="Kapas Biru蓝棉瀑布实景" loading="lazy">
-            <figcaption><div><b>Kapas Biru · 蓝棉瀑布</b><span>藏在密林里的单束高瀑</span></div><a href="https://commons.wikimedia.org/wiki/File:Air_Terjun_Kapas_Biru_Lumajang_(Unsplash).jpg">图源 ↗</a></figcaption>
-          </figure>
+      <section class="day-story" id="day-story" aria-live="polite">
+        <div class="day-heading">
+          <p class="day-date" id="day-date">09.27 · SUN</p>
+          <h2 id="day-title">抵达东爪哇</h2>
+          <p class="day-route" id="day-route">上海浦东 → 短转机 → 泗水机场 → 市区酒店</p>
         </div>
-      </section>
-      <div class="day-content">
-        <section class="schedule">
-          <h3>今天怎么走</h3>
-          <ol>
-            <li><time>07:00</time><div><b>泗水酒店出发</b><p>早餐打包，专车前往赛武瀑布，预计 3.5—4.5 小时。</p></div></li>
-            <li><time>11:30</time><div><b>赛武观景台 + 谷底</b><p>先在上方看全景，再按天气和体力决定是否下谷；谷底约 2—3 小时。</p></div></li>
-            <li><time>14:30</time><div><b>Blue Cotton</b><p>水位安全、没有失温迹象才加走；天气转差则直接返回。</p></div></li>
-            <li><time>16:00—20:00</time><div><b>前往布罗莫</b><p>车程约 4 小时，途中吃晚饭；入住后不再安排夜游。</p></div></li>
-          </ol>
-        </section>
-        <aside class="day-side">
-          <div class="hotel">
-            <span>今晚住 · 两间房</span>
-            <h3>Jiwa Jawa Resort Bromo</h3>
-            <p>火山脚下的木石设计，第二天进入布罗莫更顺。</p>
-            <b>约 ¥1,600—2,400</b>
-            <small>备选：Plataran Bromo；预算型：Lava View Lodge</small>
-          </div>
-          <div class="notice"><span>当天注意</span><p>峡谷台阶和水路很滑，只跟当地向导。暴雨、上游涨水或现场封闭时不下谷；手机必须进防水袋。</p></div>
-          <div class="day-cost"><span>3 人当日预算</span><b>¥1,400—1,900</b><small>Java 团可能已含住宿与用车</small></div>
-        </aside>
-      </div>
-    </article>
 
-    <article class="day page" id="day-03">
-      <header class="day-head">
-        <div class="day-number">03</div>
-        <div><p>09.29 · TUE</p><h2>布罗莫火山</h2><span>观景台 → 沙海 → 火山口 → 外南梦</span></div>
-        <strong>主要项目<br><em>吉普穿越、沙海、火山口徒步</em></strong>
-      </header>
-      <figure class="day-map"><img src="assets/maps/daily/day-03.jpg" alt="第3天布罗莫至外南梦的静态路线地图" loading="lazy"></figure>
-      <section class="scenes" aria-label="第3天景点实景照片">
-        <div class="scenes-title"><b>今天会看到什么</b><span>真正的火山荒原</span></div>
-        <div class="scene-grid two">
-          <figure class="scene-card">
-            <img src="assets/indonesia/scenes/bromo-sunrise.jpg" alt="布罗莫火山群与塞梅鲁火山实景" loading="lazy">
-            <figcaption><div><b>Bromo 火山群</b><span>层叠锥形火山与远处的 Semeru</span></div><a href="https://commons.wikimedia.org/wiki/File:Mount_Bromo_at_sunrise,_showing_its_volcanoes_and_Mount_Semeru_(background).jpg">图源 ↗</a></figcaption>
-          </figure>
-          <figure class="scene-card">
-            <img src="assets/indonesia/scenes/bromo-sea-of-sand.jpg" alt="布罗莫沙海与骑马游客实景" loading="lazy">
-            <figcaption><div><b>Sea of Sand · 沙海</b><span>吉普和马匹穿过黑色火山沙</span></div><a href="https://commons.wikimedia.org/wiki/File:Bromo-Tengger-Semeru-National-Park_Indonesia_Horses-02.jpg">图源 ↗</a></figcaption>
-          </figure>
+        <div class="story-layout">
+          <div class="photo-stack" id="photo-stack">
+            <figure class="photo-card photo-card-primary">
+              <img id="photo-primary" src="assets/indonesia/bromo.jpg" alt="布罗莫火山景观">
+              <figcaption id="photo-primary-caption">EAST JAVA · 抵达火山岛</figcaption>
+            </figure>
+            <figure class="photo-card photo-card-secondary">
+              <img id="photo-secondary" src="assets/maps/daily/day-01.jpg" alt="第一天路线地图">
+              <figcaption id="photo-secondary-caption">DAY 01 ROUTE</figcaption>
+            </figure>
+          </div>
+
+          <div class="day-copy">
+            <div class="main-project">
+              <span>MAIN QUEST</span>
+              <h3 id="day-main">落地、休息、准备 Java 段</h3>
+            </div>
+            <ol class="schedule" id="schedule"></ol>
+          </div>
+        </div>
+
+        <div class="day-bottom">
+          <article class="hotel-block">
+            <span>STAY · 两间房</span>
+            <h3 id="hotel-name">Mövenpick Surabaya City</h3>
+            <p id="hotel-copy">到达日优先睡眠和接车便利，不追求景区氛围。</p>
+            <strong id="hotel-price">约 ¥900—1,400</strong>
+            <small id="hotel-backup">备选：Four Points by Sheraton Surabaya, Pakuwon Indah</small>
+          </article>
+          <article class="notice-block">
+            <span>BE CAREFUL</span>
+            <p id="day-notice">只买一张联程票。落地延误也不要继续赶四小时山路。</p>
+          </article>
+          <article class="cost-block">
+            <span>3 人当日预算</span>
+            <strong id="day-cost">¥1,100—1,800</strong>
+            <small id="day-cost-note">接机、餐饮与两间房</small>
+          </article>
         </div>
       </section>
-      <div class="day-content">
-        <section class="schedule">
-          <h3>今天怎么走</h3>
-          <ol>
-            <li><time>07:00</time><div><b>正常起床吃早餐</b><p>不追日出，把全程唯一一次凌晨起床留给伊真。</p></div></li>
-            <li><time>08:30</time><div><b>吉普进入布罗莫</b><p>先走视野开阔的观景点，再进入沙海，避开日出后的车流高峰。</p></div></li>
-            <li><time>10:30</time><div><b>步行至火山口</b><p>按自己的节奏走台阶；风沙过大时戴 N95，不在护栏外拍照。</p></div></li>
-            <li><time>13:00—20:00</time><div><b>横穿东爪哇去外南梦</b><p>约 6—7 小时，途中完成午餐和晚餐，抵达后准备健康证明。</p></div></li>
-          </ol>
-        </section>
-        <aside class="day-side">
-          <div class="hotel">
-            <span>今晚住 · 两间房</span>
-            <h3>Kokoon Hotel Banyuwangi</h3>
-            <p>房间新、休息效率高，并可要求准备凌晨早餐盒。</p>
-            <b>约 ¥800—1,300</b>
-            <small>备选：Dialoog Banyuwangi（价格合适时升级）</small>
-          </div>
-          <div class="notice"><span>当天注意</span><p>不骑无保护的马，不靠近火山口护栏。火山警戒升级或园区临时关闭时，直接改观景台行程。</p></div>
-          <div class="day-cost"><span>3 人当日预算</span><b>¥1,200—1,700</b><small>吉普、门票、餐饮与 Java 团费用</small></div>
-        </aside>
-      </div>
-    </article>
 
-    <article class="day feature-day page" id="day-04">
-      <header class="day-head">
-        <div class="day-number">04</div>
-        <div><p>09.30 · WED</p><h2>唯一一次凌晨：伊真蓝火</h2><span>外南梦 → 伊真 → 吉打邦 → 吉利马努克 → 洛维纳</span></div>
-        <strong>主要项目<br><em>蓝火、火山湖、轮渡进入巴厘岛</em></strong>
-      </header>
-      <figure class="day-map"><img src="assets/maps/daily/day-04.jpg" alt="第4天外南梦、伊真火山和巴厘岛北部的静态路线地图" loading="lazy"></figure>
-      <section class="scenes" aria-label="第4天景点实景照片">
-        <div class="scenes-title"><b>今天会看到什么</b><span>黑夜蓝火 → 清晨湖蓝</span></div>
-        <div class="scene-grid two">
-          <figure class="scene-card">
-            <img src="assets/indonesia/scenes/ijen-blue-fire.jpg" alt="伊真火山硫磺蓝火实景" loading="lazy">
-            <figcaption><div><b>Ijen Blue Fire · 伊真蓝火</b><span>凌晨才看得见的蓝色硫磺火焰</span></div><a href="https://commons.wikimedia.org/wiki/File:Blue_Sulfur_Flames.JPG">图源 ↗</a></figcaption>
-          </figure>
-          <figure class="scene-card">
-            <img src="assets/indonesia/scenes/ijen-crater.jpg" alt="伊真火山口酸性湖实景" loading="lazy">
-            <figcaption><div><b>Ijen Crater · 火山湖</b><span>天亮后才显出的巨大蓝绿色火山湖</span></div><a href="https://commons.wikimedia.org/wiki/File:Kawah-Ijen_Indonesia_Acidious-Lake-at_the-floor-of-the-crater-01.jpg">图源 ↗</a></figcaption>
-          </figure>
-        </div>
-      </section>
-      <div class="day-content">
-        <section class="schedule">
-          <h3>今天怎么走</h3>
-          <ol>
-            <li><time>00:30</time><div><b>酒店出发</b><p>带健康证明、头灯、防滑鞋、保暖层和合格防毒面具。</p></div></li>
-            <li><time>02:00</time><div><b>Paltuding 登山口进入</b><p>全程跟向导慢走；蓝火区域能否进入，以当天风向和现场管制为准。</p></div></li>
-            <li><time>07:30</time><div><b>下山、早餐、换衣</b><p>洗脸并换掉带硫磺味的外层，补水后再开始跨岛移动。</p></div></li>
-            <li><time>10:30—16:00</time><div><b>轮渡进入巴厘岛</b><p>吉打邦到吉利马努克约 1 小时，再包车约 2.5 小时到洛维纳。</p></div></li>
-          </ol>
-        </section>
-        <aside class="day-side">
-          <div class="hotel">
-            <span>今晚住 · 两间房</span>
-            <h3>The Damai Lovina</h3>
-            <p>山景花园、环境安静，适合火山之后完整恢复。</p>
-            <b>约 ¥1,900—2,500</b>
-            <small>备选：The Lovina Bali Resort</small>
-          </div>
-          <div class="notice"><span>当天注意</span><p>需要三日内健康证明。出现头晕、恶心、胸闷，或向导判断硫磺浓度和风向不利时立即折返。</p></div>
-          <div class="day-cost"><span>3 人当日预算</span><b>¥1,650—2,150</b><small>向导、防护、轮渡、用车与住宿</small></div>
-        </aside>
-      </div>
-    </article>
+      <nav class="day-rail" id="day-rail" aria-label="选择行程日期"></nav>
 
-    <article class="day page" id="day-05">
-      <header class="day-head">
-        <div class="day-number">05</div>
-        <div><p>10.01 · THU</p><h2>北巴厘岛穿越</h2><span>洛维纳 → 金塔马尼 → Leke Leke → 乌布</span></div>
-        <strong>主要项目<br><em>火山景观午餐、轻徒步、酒店恢复</em></strong>
-      </header>
-      <figure class="day-map"><img src="assets/maps/daily/day-05.jpg" alt="第5天洛维纳经金塔马尼到乌布的静态路线地图" loading="lazy"></figure>
-      <section class="scenes" aria-label="第5天景点实景照片">
-        <div class="scenes-title"><b>今天会看到什么</b><span>火山全景 + 雨林瀑布</span></div>
-        <div class="scene-grid two">
-          <figure class="scene-card">
-            <img class="scene-focus-kintamani" src="assets/indonesia/scenes/kintamani-akasa-lunch.jpg" alt="金塔马尼AKASA咖啡馆的火山景观午餐实景" loading="lazy">
-            <figcaption><div><b>AKASA · 金塔马尼</b><span>餐盘与咖啡在前，Batur 火山就在正对面</span></div><a href="https://wisatamilenial.com/akasa-kintamani-coffe/">图源 ↗</a></figcaption>
-          </figure>
-          <figure class="scene-card">
-            <img class="scene-focus-leke" src="assets/indonesia/scenes/leke-leke-pexels-v2.jpg" alt="旅行者站在Leke Leke瀑布前的实景" loading="lazy">
-            <figcaption><div><b>Leke Leke Waterfall</b><span>人物衬出瀑布高度，画面更干净也更有现场感</span></div><a href="https://www.pexels.com/photo/woman-posing-near-a-waterfall-18189882/">图源 ↗</a></figcaption>
-          </figure>
-        </div>
-      </section>
-      <div class="day-content">
-        <section class="schedule">
-          <h3>今天怎么走</h3>
-          <ol>
-            <li><time>09:00</time><div><b>自然醒 + 酒店早餐</b><p>不安排凌晨追海豚，让伊真之后的身体完整恢复。</p></div></li>
-            <li><time>11:30</time><div><b>金塔马尼景观午餐</b><p>选择正对 Batur 火山的餐厅；云层太厚则缩短停留。</p></div></li>
-            <li><time>14:30</time><div><b>Leke Leke 瀑布</b><p>往返约 60—90 分钟，路线比赛武轻松，但雨后仍需防滑鞋。</p></div></li>
-            <li><time>17:30</time><div><b>乌布连住两晚</b><p>入住后只安排酒店晚餐或 SPA，不再跨区移动。</p></div></li>
-          </ol>
-        </section>
-        <aside class="day-side">
-          <div class="hotel">
-            <span>今晚住 · 两间房</span>
-            <h3>Dinara Ubud</h3>
-            <p>绿意和室内设计兼顾，位置适合做两晚稳定基地。</p>
-            <b>约 ¥1,800—2,400</b>
-            <small>备选：Adiwana Unagi Suites（关注含税总价）</small>
-          </div>
-          <div class="notice"><span>当天注意</span><p>今天的任务是恢复，不临时增加远距离景点。确认司机有休息时间；山路下雨时主动降低车速。</p></div>
-          <div class="day-cost"><span>3 人当日预算</span><b>¥950—1,500</b><small>用车、门票、餐饮；酒店另计</small></div>
-        </aside>
+      <div class="scroll-hint" aria-hidden="true">
+        <span>SCROLL TO TRAVEL</span><i></i>
       </div>
-    </article>
-
-    <article class="day page" id="day-06">
-      <header class="day-head">
-        <div class="day-number">06</div>
-        <div><p>10.02 · FRI</p><h2>乌布行动日</h2><span>乌布 → ATV 山谷 → Saba 黑沙滩 → 乌布</span></div>
-        <strong>主要项目<br><em>ATV 山谷线、黑沙滩、SPA</em></strong>
-      </header>
-      <figure class="day-map"><img src="assets/maps/daily/day-06.jpg" alt="第6天乌布ATV和黑沙滩的静态路线地图" loading="lazy"></figure>
-      <section class="scenes" aria-label="第6天景点实景照片">
-        <div class="scenes-title"><b>今天会看到什么</b><span>绿色山谷 → 火山黑沙</span></div>
-        <div class="scene-grid two">
-          <figure class="scene-card">
-            <img src="assets/indonesia/scenes/ubud-valley.jpg" alt="乌布山谷与稻田环境实景" loading="lazy">
-            <figcaption><div><b>Ubud Valley · ATV 环境</b><span>路线会穿过稻田、泥地和热带山谷</span></div><a href="https://commons.wikimedia.org/wiki/File:Tegallalang_Rice_Terraces_Bali.jpg">图源 ↗</a></figcaption>
-          </figure>
-          <figure class="scene-card">
-            <img src="assets/indonesia/scenes/saba-beach.jpg" alt="Saba黑沙滩实景" loading="lazy">
-            <figcaption><div><b>Saba Black Sand Beach</b><span>海浪与深色火山砂形成强烈反差</span></div><a href="https://commons.wikimedia.org/wiki/File:Pantai_Saba_Gianyar_Bali.jpg">图源 ↗</a></figcaption>
-          </figure>
-        </div>
-      </section>
-      <div class="day-content">
-        <section class="schedule">
-          <h3>今天怎么走</h3>
-          <ol>
-            <li><time>08:00</time><div><b>早餐后出发</b><p>不塞王宫和市场，把完整时间留给体验型项目。</p></div></li>
-            <li><time>09:30</time><div><b>ATV 山谷线</b><p>选择 90—120 分钟小团，穿包脚鞋和长裤，开始前试刹车。</p></div></li>
-            <li><time>13:00</time><div><b>午餐 + 回酒店洗澡</b><p>换掉湿衣，休息至少 1 小时，再安排下午活动。</p></div></li>
-            <li><time>16:00</time><div><b>Saba 黑沙滩 + SPA</b><p>海边只看景不下浪，晚餐后整理佩尼达一日小包。</p></div></li>
-          </ol>
-        </section>
-        <aside class="day-side">
-          <div class="hotel">
-            <span>今晚住 · 连住不换房</span>
-            <h3>Dinara Ubud</h3>
-            <p>继续住同一酒店，避免多一次收拾和搬运行李。</p>
-            <b>约 ¥1,800—2,400</b>
-            <small>第二晚应与首晚一起预订并确认同房连住</small>
-          </div>
-          <div class="notice"><span>当天注意</span><p>ATV 必须提供全盔和保险，拒绝游客竞速、混行公路或车况明显不佳的运营商；黑沙滩浪大时不上水线。</p></div>
-          <div class="day-cost"><span>3 人当日预算</span><b>¥1,400—2,200</b><small>ATV、SPA、用车与餐饮</small></div>
-        </aside>
-      </div>
-    </article>
-
-    <article class="day page" id="day-07">
-      <header class="day-head">
-        <div class="day-number">07</div>
-        <div><p>10.03 · SAT</p><h2>精灵坠崖与佩尼达西线</h2><span>乌布 → Sanur → Nusa Penida 西线 → Sanur</span></div>
-        <strong>主要项目<br><em>精灵坠崖、Broken Beach、可控浮潜</em></strong>
-      </header>
-      <figure class="day-map"><img src="assets/maps/daily/day-07.jpg" alt="第7天乌布、沙努尔和佩尼达岛西线的静态路线地图" loading="lazy"></figure>
-      <section class="scenes" aria-label="第7天景点实景照片">
-        <div class="scenes-title"><b>今天会看到什么</b><span>佩尼达西线四连击</span></div>
-        <div class="scene-grid four">
-          <figure class="scene-card">
-            <img src="assets/indonesia/scenes/kelingking.jpg" alt="精灵坠崖与海湾实景" loading="lazy">
-            <figcaption><div><b>Kelingking · 精灵坠崖</b><span>像霸王龙脊背一样探入印度洋</span></div><a href="https://commons.wikimedia.org/wiki/File:Kelingking_Beach_(T-Rex_Bay)_of_Nusa_Penida,_Bali_(2025)_-_img_02.jpg">图源 ↗</a></figcaption>
-          </figure>
-          <figure class="scene-card">
-            <img src="assets/indonesia/scenes/broken-beach.jpg" alt="Broken Beach天然海蚀拱门实景" loading="lazy">
-            <figcaption><div><b>Broken Beach</b><span>海水穿过巨大的天然石拱门</span></div><a href="https://commons.wikimedia.org/wiki/File:Broken_Bay,_Nusa_Penida.jpg">图源 ↗</a></figcaption>
-          </figure>
-          <figure class="scene-card">
-            <img src="assets/indonesia/scenes/angels-billabong.jpg" alt="Angel's Billabong天然潮池实景" loading="lazy">
-            <figcaption><div><b>Angel’s Billabong</b><span>悬崖边的翡翠色天然潮池</span></div><a href="https://commons.wikimedia.org/wiki/File:Angels_Billabong_(142797899).jpeg">图源 ↗</a></figcaption>
-          </figure>
-          <figure class="scene-card">
-            <img src="assets/indonesia/manta.jpg" alt="佩尼达海域蝠鲼浮潜实景" loading="lazy">
-            <figcaption><div><b>Manta Point · 浮潜</b><span>是否下水完全服从当天水流</span></div><span class="photo-tag">实景参考</span></figcaption>
-          </figure>
-        </div>
-      </section>
-      <div class="day-content">
-        <section class="schedule">
-          <h3>今天怎么走</h3>
-          <ol>
-            <li><time>06:20</time><div><b>乌布出发去 Sanur</b><p>主行李送当晚酒店寄存，提前 45 分钟到快船码头。</p></div></li>
-            <li><time>09:30</time><div><b>Kelingking 精灵坠崖</b><p>只在上方观景区域活动，不下陡坡去海滩。</p></div></li>
-            <li><time>11:30</time><div><b>Broken Beach + Angel’s Billabong</b><p>涨潮、大浪或护栏区域湿滑时，不进入天然池边缘。</p></div></li>
-            <li><time>14:00—17:30</time><div><b>可控浮潜 + 返回 Sanur</b><p>水流合适才下水；不抢最后一班船，回本岛后直接入住。</p></div></li>
-          </ol>
-        </section>
-        <aside class="day-side">
-          <div class="hotel">
-            <span>今晚住 · 两间房</span>
-            <h3>ARTOTEL Sanur</h3>
-            <p>有设计感，兼顾快船码头和第二天去机场的动线。</p>
-            <b>约 ¥1,700—2,400</b>
-            <small>备选：Akana Boutique Hotel</small>
-          </div>
-          <div class="notice"><span>当天注意</span><p>精灵坠崖只看上方观景台。浮潜全程穿合身救生衣；水性一般时不离开向导和小艇可见范围。</p></div>
-          <div class="day-cost"><span>3 人当日预算</span><b>¥1,650—2,400</b><small>快船、岛上包车、浮潜与餐饮</small></div>
-        </aside>
-      </div>
-    </article>
-
-    <article class="day page" id="day-08">
-      <header class="day-head">
-        <div class="day-number">08</div>
-        <div><p>10.04 · SUN</p><h2>飞往科莫多</h2><span>Sanur → 巴厘岛机场 → Labuan Bajo</span></div>
-        <strong>主要项目<br><em>境内飞行、海湾日落、出海确认</em></strong>
-      </header>
-      <figure class="day-map"><img src="assets/maps/daily/day-08.jpg" alt="第8天巴厘岛飞往拉布安巴焦的静态路线地图" loading="lazy"></figure>
-      <section class="scenes" aria-label="第8天拉布安巴焦实景照片">
-        <div class="scenes-title"><b>今天会看到什么</b><span>海湾小城的第一眼</span></div>
-        <div class="scene-grid one">
-          <figure class="scene-card">
-            <img src="assets/indonesia/scenes/labuan-bajo.jpg" alt="拉布安巴焦海湾与岛屿实景" loading="lazy">
-            <figcaption><div><b>Labuan Bajo · 拉布安巴焦</b><span>飞机落地后，群岛和海湾从窗外铺开</span></div><a href="https://commons.wikimedia.org/wiki/File:Labuan_Bajo,_Flores,_Indonesia,_20250823_0718_2839.jpg">图源 ↗</a></figcaption>
-          </figure>
-        </div>
-      </section>
-      <div class="day-content">
-        <section class="schedule">
-          <h3>今天怎么走</h3>
-          <ol>
-            <li><time>08:30</time><div><b>早餐 + 退房</b><p>主行李正常托运，充电宝和贵重物品随身携带。</p></div></li>
-            <li><time>10:30</time><div><b>提前 2.5 小时到 DPS</b><p>境内航班也不压缩机场时间，给道路拥堵和托运行李留余量。</p></div></li>
-            <li><time>13:00—14:15</time><div><b>DPS 直飞 LBJ</b><p>优先不晚于 14:00 起飞的航班，发生延误仍有缓冲。</p></div></li>
-            <li><time>16:00</time><div><b>入住 + 海湾日落</b><p>和船方复核次日接车、救生衣、路线、园区费用及天气。</p></div></li>
-          </ol>
-        </section>
-        <aside class="day-side">
-          <div class="hotel">
-            <span>今晚住 · 两间房</span>
-            <h3>Loccal Collection Komodo</h3>
-            <p>白色阶梯建筑面向海湾，设计感和旅行氛围突出。</p>
-            <b>约 ¥2,100—2,500</b>
-            <small>备选：Sudamala Resort, Seraya（价格和接送合适时）</small>
-          </div>
-          <div class="notice"><span>当天注意</span><p>必须搭上午或中午航班；当天不预订不能退款的日落船或正式出海项目，把航班延误风险留在缓冲日。</p></div>
-          <div class="day-cost"><span>3 人当日预算</span><b>¥1,050—2,400</b><small>境内机票、接送和餐饮；酒店另计</small></div>
-        </aside>
-      </div>
-    </article>
-
-    <article class="day feature-day page" id="day-09">
-      <header class="day-head">
-        <div class="day-number">09</div>
-        <div><p>10.05 · MON</p><h2>科莫多主场</h2><span>LBJ → Padar → Pink Beach → Komodo → Taka / Manta → LBJ</span></div>
-        <strong>主要项目<br><em>火山日出地貌、粉沙、科莫多龙、浮潜</em></strong>
-      </header>
-      <figure class="day-map"><img src="assets/maps/daily/day-09.jpg" alt="第9天科莫多国家公园一日环线静态路线地图" loading="lazy"></figure>
-      <section class="scenes" aria-label="第9天科莫多国家公园实景照片">
-        <div class="scenes-title"><b>今天会看到什么</b><span>整趟旅程视觉高潮</span></div>
-        <div class="scene-grid five">
-          <figure class="scene-card">
-            <img src="assets/indonesia/padar.jpg" alt="帕达尔岛三湾全景实景" loading="lazy">
-            <figcaption><div><b>Padar Island · 帕达尔</b><span>登顶后同时看见三座海湾</span></div><span class="photo-tag">实景参考</span></figcaption>
-          </figure>
-          <figure class="scene-card">
-            <img src="assets/indonesia/pink_beach.jpg" alt="科莫多粉色沙滩实景" loading="lazy">
-            <figcaption><div><b>Pink Beach · 粉色沙滩</b><span>珊瑚碎屑让海岸泛出柔粉色</span></div><span class="photo-tag">实景参考</span></figcaption>
-          </figure>
-          <figure class="scene-card">
-            <img src="assets/indonesia/komodo_dragon.jpg" alt="科莫多龙实景" loading="lazy">
-            <figcaption><div><b>Komodo Dragon</b><span>必须跟 ranger 保持安全距离</span></div><span class="photo-tag">实景参考</span></figcaption>
-          </figure>
-          <figure class="scene-card">
-            <img src="assets/indonesia/scenes/taka-makassar.jpg" alt="Taka Makassar浅海沙洲与珊瑚礁实景" loading="lazy">
-            <figcaption><div><b>Taka Makassar</b><span>从空中看像一只漂在浅海里的蝠鲼</span></div><a href="https://commons.wikimedia.org/wiki/File:Beautiful_Taka_Makassar_Island.jpg">图源 ↗</a></figcaption>
-          </figure>
-          <figure class="scene-card">
-            <img src="assets/indonesia/manta.jpg" alt="科莫多海域蝠鲼实景" loading="lazy">
-            <figcaption><div><b>Manta Point</b><span>水流允许时，穿救生衣与蝠鲼同游</span></div><span class="photo-tag">实景参考</span></figcaption>
-          </figure>
-        </div>
-      </section>
-      <div class="day-content">
-        <section class="schedule">
-          <h3>今天怎么走</h3>
-          <ol>
-            <li><time>05:50</time><div><b>酒店接车去码头</b><p>快艇小团约 06:30 出发，上船先检查救生衣和当天海况。</p></div></li>
-            <li><time>08:00</time><div><b>Padar 登顶</b><p>按体力停在中段或顶端，每人携带至少 1L 水，烈日下不硬撑。</p></div></li>
-            <li><time>10:30</time><div><b>粉色沙滩 + 科莫多岛</b><p>不带走沙子；进入园区后始终跟随 ranger，不跑、不蹲近拍。</p></div></li>
-            <li><time>14:00—17:00</time><div><b>Taka Makassar / Manta Point</b><p>只有低流速时才穿救生衣下水，返港后继续住一晚。</p></div></li>
-          </ol>
-        </section>
-        <aside class="day-side">
-          <div class="hotel">
-            <span>今晚住 · 连住不换房</span>
-            <h3>Loccal Collection Komodo</h3>
-            <p>出海后回到同一酒店，不接当晚飞机，也不搬运行李。</p>
-            <b>约 ¥2,100—2,500</b>
-            <small>返程航班安排在第二天，保留整夜天气缓冲</small>
-          </div>
-          <div class="notice"><span>当天注意</span><p>看到蝠鲼是运气，下水是选择。强流、浪高、能见度差或救生衣不合身，任一出现就留在船上。</p></div>
-          <div class="day-cost"><span>3 人当日预算</span><b>¥2,600—4,300</b><small>快艇、园区费、ranger 与午餐</small></div>
-        </aside>
-      </div>
-    </article>
-
-    <article class="day page" id="day-10">
-      <header class="day-head">
-        <div class="day-number">10</div>
-        <div><p>10.06 · TUE</p><h2>从科莫多直接回家</h2><span>Labuan Bajo → Singapore → Shanghai</span></div>
-        <strong>主要项目<br><em>开口程返沪，不再飞回巴厘岛</em></strong>
-      </header>
-      <figure class="day-map"><img src="assets/maps/daily/day-10.jpg" alt="第10天拉布安巴焦经新加坡飞往上海的静态路线地图" loading="lazy"></figure>
-      <div class="day-content">
-        <section class="schedule">
-          <h3>今天怎么走</h3>
-          <ol>
-            <li><time>起飞前 3H</time><div><b>酒店退房去 LBJ</b><p>在柜台再次确认行李能否直挂 PVG，保留两段登机牌。</p></div></li>
-            <li><time>白天</time><div><b>LBJ 直飞新加坡</b><p>周二优先使用 Scoot 班期；最终时间以出票页面为准。</p></div></li>
-            <li><time>目标 2—5H</time><div><b>樟宜机场联程</b><p>同一订单可接受短转；若需要入境取行李，则必须改成至少 7 小时。</p></div></li>
-            <li><time>夜间</time><div><b>SIN 飞往 PVG</b><p>不再返回巴厘岛，保险、登机牌和费用票据保留至回国。</p></div></li>
-          </ol>
-        </section>
-        <aside class="day-side">
-          <div class="hotel no-hotel">
-            <span>今晚住</span>
-            <h3>回到上海</h3>
-            <p>返程只接受同一订单、行李直挂的联程组合。</p>
-            <b>不产生印尼住宿费</b>
-            <small>若无法组成联程，优先改经雅加达，不压缩分票转机</small>
-          </div>
-          <div class="notice"><span>当天注意</span><p>订票页必须明确显示两段在同一订单。分票自转时，2—5 小时完全不够；不要用误机风险换几百元差价。</p></div>
-          <div class="day-cost"><span>3 人当日地面预算</span><b>¥300—600</b><small>送机与餐饮，不含返程机票</small></div>
-        </aside>
-      </div>
-    </article>
-
-    <section class="booking page">
-      <p class="eyebrow ink">Booking order</p>
-      <h2>按这个顺序下单</h2>
-      <div class="booking-steps">
-        <div><b>01</b><h3>先锁国际开口程</h3><p>PVG→SUB 与 LBJ→PVG。三人总机票进入 ¥14,500—20,000 再下单。</p></div>
-        <div><b>02</b><h3>再锁科莫多段</h3><p>DPS→LBJ 选中午前后航班；科莫多快艇安排在返程前一天。</p></div>
-        <div><b>03</b><h3>酒店全部选可取消</h3><p>两间含税每晚不超过 ¥2,500，优先早餐、评分 8.5+、24 小时前台。</p></div>
-        <div><b>04</b><h3>最后确认天气项目</h3><p>伊真、佩尼达和科莫多均以开放状态、火山预警和海况为准。</p></div>
-      </div>
-      <p class="price-note">价格为 2026-07-23 查询后的规划区间，不是锁定报价。地图底图：© OpenStreetMap contributors、© CARTO；路线为行程规划示意。新增景点实景图来自 Wikimedia Commons，具体作者与许可见每张图片的“图源”链接。</p>
     </section>
   </main>
 
-  <footer>
-    <div class="page"><b>INDONESIA · 10 DAYS / 9 NIGHTS</b><span>PVG → SUB · DPS → LBJ · LBJ → SIN → PVG</span></div>
-  </footer>
+  <aside class="planning" id="planning" aria-hidden="true">
+    <button class="planning-close" id="planning-close" type="button" aria-label="关闭出发准备">×</button>
+    <div class="planning-inner">
+      <p class="kicker">BEFORE DEPARTURE</p>
+      <h2>先订什么，<br><em>什么时候下单。</em></h2>
+      <div class="planning-grid">
+        <article>
+          <span>01 · 先锁国际机票</span>
+          <h3>PVG → SUB<br>LBJ → SIN → PVG</h3>
+          <p>优先同订单、行李直挂。3 人往返总价进入 <b>¥14,500—20,000</b> 就可以下单；科莫多直接回家，不回巴厘岛。</p>
+        </article>
+        <article>
+          <span>02 · 再锁交通骨架</span>
+          <h3>Java 包车 + DPS → LBJ</h3>
+          <p>Java 段司机需要覆盖泗水、赛武、布罗莫、伊真与轮渡。境内航班尽量订 10 月 4 日中午前后。</p>
+        </article>
+        <article>
+          <span>03 · 酒店策略</span>
+          <h3>设计感优先，位置服务路线</h3>
+          <p>9 晚两间房预计 <b>¥14,500—20,800</b>。布罗莫、洛维纳和乌布优先锁可取消房价。</p>
+        </article>
+        <article>
+          <span>04 · 行前健康</span>
+          <h3>伊真需要近期健康证明</h3>
+          <p>这是伊真景区对徒步游客的入山要求，不是印尼入境材料。通常在出发前 3 天内由诊所开具，确认适合高海拔徒步。</p>
+        </article>
+        <article>
+          <span>05 · 海上活动</span>
+          <h3>救生衣全程穿，不追蝠鲼</h3>
+          <p>水性一般也能参加浮潜，但要提前告诉船方；流大、浪高或身体不适时留在船上。</p>
+        </article>
+        <article>
+          <span>06 · 预算边界</span>
+          <h3>总预算 ¥43,000—63,000</h3>
+          <p>包含三人机票、两间房、Java 包车、科莫多船、主要活动与餐饮。建议另留 10% 机动金。</p>
+        </article>
+      </div>
+      <footer>
+        <b>价格说明</b>
+        <p>均为 2026 年 9—10 月三人规划价，不是锁定报价。机票和酒店以支付页为准；地图用于行程理解，不替代现场导航。</p>
+      </footer>
+    </div>
+  </aside>
+
+  <noscript>
+    <div class="noscript">此行程舞台需要启用 JavaScript 才能切换 10 天内容。</div>
+  </noscript>
+  <script src="app.js"></script>
 </body>
 </html>

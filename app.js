@@ -12,14 +12,14 @@ const days = [
     transport: { icon: "✈", mode: "flight", label: "国际航班", detail: "上海 → 泗水" },
     region: "java",
     terrainStops: [
-      { coord: [112.35, -7.20], mode: "flight" },
+      { coord: [121.81, 31.15], mode: "flight" },
       { coord: [112.79, -7.38], mode: "flight" },
       { coord: [112.72, -7.31], mode: "road" },
       { coord: [112.72, -7.31], mode: "road" }
     ],
     photos: [
       ["assets/indonesia/bromo.jpg", "EAST JAVA · 抵达火山岛", "东爪哇火山景观"],
-      ["assets/maps/daily/day-01.jpg", "DAY 01 ROUTE", "第一天飞抵泗水路线地图"]
+      ["assets/indonesia/scenes/tumpak-sewu.jpg", "EAST JAVA · 瀑布预告", "东爪哇赛武瀑布景观"]
     ],
     schedule: [
       ["上午", "上海浦东出发", "一次短转机，行李直挂；目标转机 2—4 小时、总时长 10—14 小时。"],
@@ -236,14 +236,14 @@ const days = [
     transport: { icon: "✈", mode: "flight", label: "境内航班", detail: "巴厘岛 → 拉布安巴焦" },
     region: "komodo",
     terrainStops: [
-      { coord: [119.35, -8.35], mode: "flight" },
+      { coord: [115.26, -8.69], mode: "flight" },
       { coord: [119.89, -8.49], mode: "flight" },
       { coord: [119.88, -8.50], mode: "flight" },
       { coord: [119.87, -8.49], mode: "road" }
     ],
     photos: [
       ["assets/indonesia/scenes/labuan-bajo.jpg", "LABUAN BAJO · 海湾日落", "拉布安巴焦海湾"],
-      ["assets/maps/daily/day-08.jpg", "DAY 08 ROUTE", "巴厘岛飞往拉布安巴焦路线地图"]
+      ["assets/indonesia/padar.jpg", "KOMODO · 火山海湾预告", "科莫多帕达尔岛景观"]
     ],
     schedule: [
       ["08:30", "Sanur 早餐退房", "酒店叫车，预留巴厘岛周末交通时间。"],
@@ -302,12 +302,12 @@ const days = [
     terrainStops: [
       { coord: [119.88, -8.50], mode: "road" },
       { coord: [119.89, -8.49], mode: "flight" },
-      { coord: [119.45, -8.28], mode: "flight" },
-      { coord: [119.30, -8.25], mode: "flight" }
+      { coord: [103.82, 1.35], mode: "flight" },
+      { coord: [121.81, 31.15], mode: "flight" }
     ],
     photos: [
       ["assets/indonesia/scenes/labuan-bajo.jpg", "FAREWELL · 海湾清晨", "拉布安巴焦海湾清晨"],
-      ["assets/maps/daily/day-10.jpg", "OPEN-JAW ROUTE · 直接回家", "科莫多经新加坡回上海路线地图"]
+      ["assets/indonesia/pink_beach.jpg", "FAREWELL · 粉色海岸回忆", "科莫多粉色沙滩"]
     ],
     schedule: [
       ["起飞前 3h", "酒店出发去 LBJ", "退房前再次确认行李直挂上海。"],

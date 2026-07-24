@@ -72,6 +72,10 @@ const MODE_COLORS = {
   flight: 0xc3a7ff
 };
 
+const GLOBE_RADIUS = 20;
+const GLOBE_CENTER_Y = -20.45;
+const TERRAIN_RELIEF = .68;
+
 class TerrainStage {
   constructor(canvas, itinerary) {
     this.canvas = canvas;
@@ -86,6 +90,7 @@ class TerrainStage {
     this.cameraTween = null;
     this.motion = null;
     this.labelSprites = [];
+    this.photoSprites = [];
 
     this.renderer = new THREE.WebGLRenderer({
       canvas,
@@ -214,6 +219,30 @@ class TerrainStage {
     return new THREE.Vector3(x, 0, z);
   }
 
+  surfaceY(x, z) {
+    const radial = Math.min(GLOBE_RADIUS - .02, Math.hypot(x, z));
+    return GLOBE_CENTER_Y + Math.sqrt(Math.max(.01, GLOBE_RADIUS ** 2 - radial ** 2));
+  }
+
+  surfacePoint(coordinate, altitude = 0, config = REGION_CONFIG[this.currentRegion]) {
+    const point = this.toLocal(coordinate, config);
+    point.y = this.surfaceY(point.x, point.z) + altitude;
+    return point;
+  }
+
+  terrainPoint(coordinate, extra = 0, config = REGION_CONFIG[this.currentRegion]) {
+    return this.surfacePoint(coordinate, this.heightAt(coordinate, config) * TERRAIN_RELIEF + extra, config);
+  }
+
+  surfaceNormal(point) {
+    return new THREE.Vector3(point.x, point.y - GLOBE_CENTER_Y, point.z).normalize();
+  }
+
+  alignToSurface(object, point) {
+    object.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), this.surfaceNormal(point));
+    return object;
+  }
+
   heightAt(coordinate, config = REGION_CONFIG[this.currentRegion]) {
     const [lon, lat] = coordinate;
     let height = .26;
@@ -254,6 +283,20 @@ class TerrainStage {
     });
   }
 
+  visibleTerrainEntries(day) {
+    const config = REGION_CONFIG[day.region];
+    const [minLon, maxLon, minLat, maxLat] = config.bounds;
+    const padding = .12;
+    return day.terrainStops
+      .map((stop, index) => ({ stop, index }))
+      .filter(({ stop }) => (
+        stop.coord[0] >= minLon - padding &&
+        stop.coord[0] <= maxLon + padding &&
+        stop.coord[1] >= minLat - padding &&
+        stop.coord[1] <= maxLat + padding
+      ));
+  }
+
   buildTerrainGeometry(config) {
     const [minLon, maxLon, minLat, maxLat] = config.bounds;
     const nx = 112;
@@ -268,9 +311,9 @@ class TerrainStage {
       ];
       if (!this.isLand(center, config)) return;
       coordinates.forEach(coordinate => {
-        const point = this.toLocal(coordinate, config);
         const height = this.heightAt(coordinate, config);
-        positions.push(point.x, height, point.z);
+        const point = this.surfacePoint(coordinate, height * TERRAIN_RELIEF, config);
+        positions.push(point.x, point.y, point.z);
         const color = this.colorForHeight(height);
         colors.push(color.r, color.g, color.b);
       });
@@ -294,41 +337,50 @@ class TerrainStage {
     return geometry;
   }
 
-  createOceanBase(config) {
-    const base = new THREE.Group();
-    const regionMaterial = new THREE.MeshStandardMaterial({
-      color: config.color,
-      roughness: .72,
-      metalness: .02
-    });
+  createGlobe(config) {
+    const globe = new THREE.Group();
     const oceanMaterial = new THREE.MeshPhysicalMaterial({
-      color: 0x4faebb,
-      roughness: .26,
-      metalness: .06,
+      color: 0x3f9cae,
+      roughness: .3,
+      metalness: .04,
       transparent: true,
-      opacity: .96,
-      clearcoat: .45
+      opacity: .98,
+      clearcoat: .58,
+      clearcoatRoughness: .28
     });
 
-    const pedestal = new THREE.Mesh(new THREE.CylinderGeometry(20.5, 20.5, 1.15, 96), regionMaterial);
-    pedestal.position.y = -.94;
-    pedestal.receiveShadow = true;
-    base.add(pedestal);
-
-    const ocean = new THREE.Mesh(new THREE.CircleGeometry(20.5, 96), oceanMaterial);
-    ocean.rotation.x = -Math.PI / 2;
-    ocean.position.y = -.35;
+    const ocean = new THREE.Mesh(new THREE.SphereGeometry(GLOBE_RADIUS, 128, 96), oceanMaterial);
+    ocean.position.y = GLOBE_CENTER_Y;
     ocean.receiveShadow = true;
-    base.add(ocean);
+    globe.add(ocean);
 
-    const rim = new THREE.Mesh(
-      new THREE.TorusGeometry(20.5, .14, 10, 128),
-      new THREE.MeshStandardMaterial({ color: 0xfff1d5, roughness: .5 })
+    const grid = new THREE.Mesh(
+      new THREE.SphereGeometry(GLOBE_RADIUS + .06, 48, 32),
+      new THREE.MeshBasicMaterial({
+        color: 0xc9f5ed,
+        wireframe: true,
+        transparent: true,
+        opacity: .055,
+        depthWrite: false
+      })
     );
-    rim.rotation.x = Math.PI / 2;
-    rim.position.y = -.33;
-    base.add(rim);
-    return base;
+    grid.position.y = GLOBE_CENTER_Y;
+    globe.add(grid);
+
+    const atmosphere = new THREE.Mesh(
+      new THREE.SphereGeometry(GLOBE_RADIUS + .42, 96, 64),
+      new THREE.MeshBasicMaterial({
+        color: config.color,
+        side: THREE.BackSide,
+        transparent: true,
+        opacity: .1,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      })
+    );
+    atmosphere.position.y = GLOBE_CENTER_Y;
+    globe.add(atmosphere);
+    return globe;
   }
 
   createTree(scale = 1) {
@@ -349,27 +401,30 @@ class TerrainStage {
   }
 
   createBeach(beach, config) {
-    const point = this.toLocal(beach.coord, config);
+    const point = this.surfacePoint(beach.coord, .12, config);
+    const geometry = new THREE.CircleGeometry(beach.scale, 32);
+    geometry.rotateX(-Math.PI / 2);
     const beachMesh = new THREE.Mesh(
-      new THREE.CircleGeometry(beach.scale, 32),
+      geometry,
       new THREE.MeshStandardMaterial({ color: beach.color, roughness: .82, depthTest: false })
     );
-    beachMesh.rotation.x = -Math.PI / 2;
-    beachMesh.position.set(point.x, .34, point.z);
+    beachMesh.position.copy(point);
+    this.alignToSurface(beachMesh, point);
     beachMesh.renderOrder = 4;
     beachMesh.receiveShadow = true;
     return beachMesh;
   }
 
   createVolcanoCrater(peak, config) {
-    const point = this.toLocal(peak.coord, config);
-    const height = this.heightAt(peak.coord, config);
+    const point = this.terrainPoint(peak.coord, .03, config);
+    const geometry = new THREE.TorusGeometry(.32, .09, 8, 24);
+    geometry.rotateX(Math.PI / 2);
     const crater = new THREE.Mesh(
-      new THREE.TorusGeometry(.32, .09, 8, 24),
+      geometry,
       new THREE.MeshStandardMaterial({ color: 0x5f4338, roughness: .95 })
     );
-    crater.rotation.x = Math.PI / 2;
-    crater.position.set(point.x, height + .02, point.z);
+    crater.position.copy(point);
+    this.alignToSurface(crater, point);
     crater.castShadow = true;
     return crater;
   }
@@ -383,7 +438,7 @@ class TerrainStage {
     await new Promise(resolve => requestAnimationFrame(resolve));
 
     this.disposeGroup(this.worldGroup);
-    this.worldGroup.add(this.createOceanBase(config));
+    this.worldGroup.add(this.createGlobe(config));
 
     this.setProgress(58, `正在抬升${config.name}山脉`);
     const terrain = new THREE.Mesh(
@@ -406,7 +461,6 @@ class TerrainStage {
     config.beaches.forEach(beach => this.worldGroup.add(this.createBeach(beach, config)));
 
     config.forests.forEach((coordinate, forestIndex) => {
-      const origin = this.toLocal(coordinate, config);
       for (let index = 0; index < 7; index += 1) {
         const angle = index * 2.17 + forestIndex;
         const radius = .35 + (index % 3) * .26;
@@ -414,8 +468,9 @@ class TerrainStage {
         const lonOffset = Math.cos(angle) * radius / this.regionScale(config);
         const latOffset = Math.sin(angle) * radius / this.regionScale(config);
         const treeCoord = [coordinate[0] + lonOffset, coordinate[1] + latOffset];
-        const height = this.heightAt(treeCoord, config);
-        tree.position.set(origin.x + Math.cos(angle) * radius, height, origin.z - Math.sin(angle) * radius);
+        const point = this.terrainPoint(treeCoord, 0, config);
+        tree.position.copy(point);
+        this.alignToSurface(tree, point);
         this.worldGroup.add(tree);
       }
     });
@@ -450,9 +505,95 @@ class TerrainStage {
     return sprite;
   }
 
+  createPhotoCard(photo, coordinate, index) {
+    const canvas = document.createElement("canvas");
+    canvas.width = 640;
+    canvas.height = 420;
+    const ctx = canvas.getContext("2d");
+    const drawFrame = image => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "rgba(7,31,29,.94)";
+      ctx.beginPath();
+      ctx.roundRect(6, 6, 628, 408, 30);
+      ctx.fill();
+      ctx.save();
+      ctx.beginPath();
+      ctx.roundRect(18, 18, 604, 310, 22);
+      ctx.clip();
+      if (image) {
+        const ratio = Math.max(604 / image.width, 310 / image.height);
+        const width = image.width * ratio;
+        const height = image.height * ratio;
+        ctx.drawImage(image, 320 - width / 2, 173 - height / 2, width, height);
+      } else {
+        const gradient = ctx.createLinearGradient(18, 18, 622, 328);
+        gradient.addColorStop(0, "#5fb8c2");
+        gradient.addColorStop(1, "#153f39");
+        ctx.fillStyle = gradient;
+        ctx.fillRect(18, 18, 604, 310);
+      }
+      ctx.restore();
+      ctx.strokeStyle = index ? "#c3a7ff" : "#fff0d1";
+      ctx.lineWidth = 6;
+      ctx.beginPath();
+      ctx.roundRect(9, 9, 622, 402, 28);
+      ctx.stroke();
+      ctx.fillStyle = "#fff9ec";
+      ctx.font = "700 32px Noto Sans SC, sans-serif";
+      ctx.textAlign = "left";
+      ctx.textBaseline = "middle";
+      const caption = photo[1].length > 27 ? `${photo[1].slice(0, 26)}…` : photo[1];
+      ctx.fillText(caption, 30, 370);
+    };
+    drawFrame(null);
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: texture,
+      transparent: true,
+      depthTest: false,
+      depthWrite: false
+    }));
+    sprite.scale.set(6.2, 4.05, 1);
+    sprite.renderOrder = 30;
+
+    const image = new Image();
+    image.decoding = "async";
+    image.onload = () => {
+      drawFrame(image);
+      texture.needsUpdate = true;
+    };
+    image.src = photo[0];
+
+    const anchor = this.terrainPoint(coordinate, .28);
+    const normal = this.surfaceNormal(anchor);
+    const cardPosition = anchor.clone()
+      .add(normal.multiplyScalar(3.7 + index * .35))
+      .add(new THREE.Vector3(index ? 3.2 : -3.2, 2.2 + index * .45, index ? -.2 : .25));
+    sprite.position.copy(cardPosition);
+
+    const lineGeometry = new THREE.BufferGeometry().setFromPoints([
+      anchor.clone().add(this.surfaceNormal(anchor).multiplyScalar(.4)),
+      cardPosition
+    ]);
+    const line = new THREE.Line(
+      lineGeometry,
+      new THREE.LineBasicMaterial({
+        color: index ? 0xc3a7ff : 0xfff0d1,
+        transparent: true,
+        opacity: .68,
+        depthTest: false
+      })
+    );
+    line.renderOrder = 29;
+    const group = new THREE.Group();
+    group.add(line, sprite);
+    return group;
+  }
+
   createMarker(number, coordinate, accent) {
-    const point = this.toLocal(coordinate);
-    const height = this.heightAt(coordinate);
+    const point = this.terrainPoint(coordinate, .08);
     const group = new THREE.Group();
     const pin = new THREE.Mesh(
       new THREE.CylinderGeometry(.15, .15, .72, 14),
@@ -466,7 +607,8 @@ class TerrainStage {
     );
     head.position.y = .84;
     head.castShadow = true;
-    group.position.set(point.x, height, point.z);
+    group.position.copy(point);
+    this.alignToSurface(group, point);
     group.userData.number = number;
     group.add(pin, head);
     return group;
@@ -481,11 +623,14 @@ class TerrainStage {
         THREE.MathUtils.lerp(fromStop.coord[0], toStop.coord[0], t),
         THREE.MathUtils.lerp(fromStop.coord[1], toStop.coord[1], t)
       ];
-      const point = this.toLocal(coord);
-      const landHeight = this.heightAt(coord);
-      if (mode === "flight") point.y = 1.2 + Math.sin(Math.PI * t) * 7.5;
-      else if (mode === "boat" || mode === "ferry" || mode === "speedboat") point.y = .18;
-      else point.y = landHeight + .32;
+      let point;
+      if (mode === "flight") {
+        point = this.surfacePoint(coord, 1.45 + Math.sin(Math.PI * t) * 5.8);
+      } else if (mode === "boat" || mode === "ferry" || mode === "speedboat") {
+        point = this.surfacePoint(coord, .2);
+      } else {
+        point = this.terrainPoint(coord, .3);
+      }
       points.push(point);
     }
     return points;
@@ -523,20 +668,23 @@ class TerrainStage {
   buildDayRoute(day) {
     this.disposeGroup(this.routeGroup);
     this.labelSprites = [];
+    this.photoSprites = [];
     const accent = `#${REGION_CONFIG[day.region].color.toString(16).padStart(6, "0")}`;
 
-    day.terrainStops.forEach((stop, index) => {
+    const visibleEntries = this.visibleTerrainEntries(day);
+    visibleEntries.forEach(({ stop, index }, visibleIndex) => {
       const marker = this.createMarker(index + 1, stop.coord, REGION_CONFIG[day.region].color);
       this.routeGroup.add(marker);
       const label = this.createLabel(day.schedule[index][1], accent);
-      label.position.copy(marker.position);
-      label.position.y += 2.2;
+      const markerNormal = this.surfaceNormal(marker.position);
+      label.position.copy(marker.position).add(markerNormal.multiplyScalar(1.95));
+      label.position.y += .65;
       label.visible = true;
       this.labelSprites.push(label);
       this.routeGroup.add(label);
-      if (index > 0) {
+      if (visibleIndex > 0) {
         const mode = stop.mode;
-        const previousStop = day.terrainStops[index - 1];
+        const previousStop = visibleEntries[visibleIndex - 1].stop;
         this.routeGroup.add(this.createRouteSegment(
           previousStop,
           stop,
@@ -549,89 +697,211 @@ class TerrainStage {
         const vehiclePoint = routeCurve.getPoint(.52);
         const tangent = routeCurve.getTangent(.53);
         vehicle.position.copy(vehiclePoint);
-        vehicle.rotation.y = -Math.atan2(tangent.z, tangent.x);
-        vehicle.scale.multiplyScalar(.78);
+        this.orientVehicle(vehicle, tangent, vehiclePoint);
+        vehicle.scale.multiplyScalar(1.04);
         vehicle.userData.routeVehicle = true;
         this.routeGroup.add(vehicle);
       }
     });
+
+    day.photos.slice(0, 2).forEach((photo, index) => {
+      const entry = visibleEntries[Math.min(visibleEntries.length - 1, index + 1)] || visibleEntries[0];
+      if (!entry) return;
+      const photoCard = this.createPhotoCard(photo, entry.stop.coord, index);
+      this.photoSprites.push(photoCard);
+      this.routeGroup.add(photoCard);
+    });
   }
 
   meshMaterial(color, roughness = .62) {
-    return new THREE.MeshStandardMaterial({ color, roughness, metalness: .02 });
+    return new THREE.MeshStandardMaterial({ color, roughness, metalness: .04 });
   }
 
   wheel(radius = .2, width = .12) {
-    const wheel = new THREE.Mesh(
+    const wheelGroup = new THREE.Group();
+    const tire = new THREE.Mesh(
       new THREE.CylinderGeometry(radius, radius, width, 14),
       this.meshMaterial(0x263330, .95)
     );
-    wheel.rotation.z = Math.PI / 2;
-    wheel.castShadow = true;
-    return wheel;
+    tire.rotation.x = Math.PI / 2;
+    tire.castShadow = true;
+    const hub = new THREE.Mesh(
+      new THREE.CylinderGeometry(radius * .44, radius * .44, width + .015, 12),
+      this.meshMaterial(0xd8d6ca, .3)
+    );
+    hub.rotation.x = Math.PI / 2;
+    wheelGroup.add(tire, hub);
+    return wheelGroup;
+  }
+
+  rodBetween(start, end, radius, color) {
+    const direction = end.clone().sub(start);
+    const rod = new THREE.Mesh(
+      new THREE.CylinderGeometry(radius, radius, direction.length(), 10),
+      this.meshMaterial(color, .55)
+    );
+    rod.position.copy(start).add(end).multiplyScalar(.5);
+    rod.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction.normalize());
+    rod.castShadow = true;
+    return rod;
+  }
+
+  createAtv(color) {
+    const group = new THREE.Group();
+    const chassis = new THREE.Mesh(new THREE.BoxGeometry(1.15, .22, .58), this.meshMaterial(0x273a35, .86));
+    chassis.position.y = .35;
+    const tank = new THREE.Mesh(new THREE.BoxGeometry(.52, .34, .48), this.meshMaterial(color, .48));
+    tank.position.set(.1, .59, 0);
+    const seat = new THREE.Mesh(new THREE.BoxGeometry(.45, .16, .38), this.meshMaterial(0x222b2a, .9));
+    seat.position.set(-.28, .76, 0);
+    const engine = new THREE.Mesh(new THREE.BoxGeometry(.34, .3, .42), this.meshMaterial(0xb6b8ae, .42));
+    engine.position.set(-.05, .34, 0);
+    group.add(chassis, tank, seat, engine);
+    [[-.42, .31], [.42, .31], [-.42, -.31], [.42, -.31]].forEach(([x, z]) => {
+      const atvWheel = this.wheel(.26, .17);
+      atvWheel.position.set(x, .25, z);
+      group.add(atvWheel);
+    });
+    group.add(
+      this.rodBetween(new THREE.Vector3(.35, .68, -.3), new THREE.Vector3(.35, .96, 0), .035, 0x24332f),
+      this.rodBetween(new THREE.Vector3(.35, .96, 0), new THREE.Vector3(.35, .96, .34), .035, 0x24332f)
+    );
+    const lamp = new THREE.Mesh(new THREE.SphereGeometry(.09, 12, 8), this.meshMaterial(0xfff0a8, .25));
+    lamp.position.set(.59, .6, 0);
+    group.add(lamp);
+    return group;
   }
 
   createRoadVehicle(mode, color) {
+    if (mode === "atv") return this.createAtv(color);
     const group = new THREE.Group();
-    const body = new THREE.Mesh(new THREE.BoxGeometry(1.35, .36, .72), this.meshMaterial(color));
-    body.position.y = .38;
+    const body = new THREE.Mesh(new THREE.BoxGeometry(1.55, .34, .76), this.meshMaterial(color, .48));
+    body.position.y = .43;
     body.castShadow = true;
+    const hood = new THREE.Mesh(new THREE.BoxGeometry(.48, .24, .7), this.meshMaterial(color, .43));
+    hood.position.set(.58, .68, 0);
     const cabin = new THREE.Mesh(
-      new THREE.BoxGeometry(mode === "jeep" ? .75 : .68, .38, .62),
-      this.meshMaterial(mode === "jeep" ? 0x334941 : 0xf7e7c8, .4)
+      new THREE.BoxGeometry(.76, .48, .66),
+      this.meshMaterial(mode === "jeep" ? 0x405b50 : 0xf2dfbd, .42)
     );
-    cabin.position.set(.1, .72, 0);
+    cabin.position.set(-.08, .77, 0);
     cabin.castShadow = true;
-    group.add(body, cabin);
-    [[-.43, .25], [.43, .25], [-.43, -.25], [.43, -.25]].forEach(([x, z]) => {
-      const wheel = this.wheel(mode === "atv" ? .25 : .21, .13);
-      wheel.position.set(x, .2, z);
-      group.add(wheel);
+    const windshield = new THREE.Mesh(new THREE.BoxGeometry(.035, .29, .54), this.meshMaterial(0x8bc8cf, .2));
+    windshield.position.set(.32, .83, 0);
+    const rearGlass = windshield.clone();
+    rearGlass.position.x = -.49;
+    group.add(body, hood, cabin, windshield, rearGlass);
+    [-.345, .345].forEach(z => {
+      const sideWindow = new THREE.Mesh(new THREE.BoxGeometry(.48, .25, .025), this.meshMaterial(0x6faab2, .18));
+      sideWindow.position.set(-.08, .84, z);
+      group.add(sideWindow);
     });
+    [[-.43, .25], [.43, .25], [-.43, -.25], [.43, -.25]].forEach(([x, z]) => {
+      const roadWheel = this.wheel(mode === "jeep" ? .25 : .22, .14);
+      roadWheel.position.set(x * 1.35, .25, z * 1.42);
+      group.add(roadWheel);
+    });
+    [-.23, .23].forEach(z => {
+      const lamp = new THREE.Mesh(new THREE.SphereGeometry(.075, 12, 8), this.meshMaterial(0xffe893, .2));
+      lamp.position.set(.79, .5, z);
+      group.add(lamp);
+    });
+    const bumper = new THREE.Mesh(new THREE.BoxGeometry(.08, .12, .78), this.meshMaterial(0x263330, .65));
+    bumper.position.set(.82, .29, 0);
+    group.add(bumper);
     if (mode === "jeep") {
-      const rack = new THREE.Mesh(new THREE.BoxGeometry(.72, .06, .66), this.meshMaterial(0x263330));
-      rack.position.set(.12, .98, 0);
-      group.add(rack);
-    }
-    if (mode === "atv") {
-      group.scale.set(.78, .78, .78);
-      const handle = new THREE.Mesh(new THREE.BoxGeometry(.08, .48, .62), this.meshMaterial(0x263330));
-      handle.position.set(.32, .74, 0);
-      group.add(handle);
+      const rollColor = 0x263330;
+      group.add(
+        this.rodBetween(new THREE.Vector3(-.42, .76, -.34), new THREE.Vector3(-.42, 1.23, -.34), .035, rollColor),
+        this.rodBetween(new THREE.Vector3(-.42, .76, .34), new THREE.Vector3(-.42, 1.23, .34), .035, rollColor),
+        this.rodBetween(new THREE.Vector3(-.42, 1.23, -.34), new THREE.Vector3(-.42, 1.23, .34), .035, rollColor)
+      );
+      const spare = this.wheel(.25, .12);
+      spare.rotation.y = Math.PI / 2;
+      spare.position.set(-.81, .55, 0);
+      group.add(spare);
+    } else {
+      const rack = new THREE.Mesh(new THREE.BoxGeometry(.68, .055, .6), this.meshMaterial(0x263330, .55));
+      rack.position.set(-.08, 1.04, 0);
+      const luggage = new THREE.Mesh(new THREE.BoxGeometry(.32, .18, .28), this.meshMaterial(0xff9c62, .68));
+      luggage.position.set(-.08, 1.16, 0);
+      group.add(rack, luggage);
     }
     return group;
   }
 
   createPlane(color) {
     const group = new THREE.Group();
-    const body = new THREE.Mesh(new THREE.CylinderGeometry(.16, .24, 1.9, 14), this.meshMaterial(color, .38));
+    const body = new THREE.Mesh(new THREE.CylinderGeometry(.18, .25, 2.15, 20), this.meshMaterial(color, .32));
     body.rotation.z = Math.PI / 2;
     body.castShadow = true;
-    const wing = new THREE.Mesh(new THREE.BoxGeometry(.65, .06, 2.1), this.meshMaterial(0xfff1dc, .35));
-    const tail = new THREE.Mesh(new THREE.BoxGeometry(.34, .06, .8), this.meshMaterial(0xff7867, .4));
-    tail.position.x = -.7;
-    const fin = new THREE.Mesh(new THREE.BoxGeometry(.35, .6, .08), this.meshMaterial(0xff7867, .4));
-    fin.position.set(-.72, .27, 0);
-    group.add(body, wing, tail, fin);
+    const nose = new THREE.Mesh(new THREE.ConeGeometry(.18, .48, 20), this.meshMaterial(0xfff2d7, .28));
+    nose.rotation.z = -Math.PI / 2;
+    nose.position.x = 1.28;
+    const wing = new THREE.Mesh(new THREE.BoxGeometry(.7, .07, 2.35), this.meshMaterial(0xfff1dc, .3));
+    wing.position.x = .1;
+    const tail = new THREE.Mesh(new THREE.BoxGeometry(.42, .055, .82), this.meshMaterial(0xff7867, .35));
+    tail.position.x = -.86;
+    const fin = new THREE.Mesh(new THREE.BoxGeometry(.38, .62, .065), this.meshMaterial(0xff7867, .35));
+    fin.position.set(-.9, .29, 0);
+    group.add(body, nose, wing, tail, fin);
+    [-.63, .63].forEach(z => {
+      const engine = new THREE.Mesh(new THREE.CylinderGeometry(.12, .12, .38, 14), this.meshMaterial(0xd5d8d2, .3));
+      engine.rotation.z = Math.PI / 2;
+      engine.position.set(.2, -.13, z);
+      group.add(engine);
+    });
+    for (let index = -3; index <= 3; index += 1) {
+      const planeWindow = new THREE.Mesh(new THREE.SphereGeometry(.045, 10, 8), this.meshMaterial(0x184b59, .15));
+      planeWindow.position.set(index * .22, .16, .18);
+      group.add(planeWindow);
+    }
     group.scale.set(1.15, 1.15, 1.15);
     return group;
   }
 
   createBoat(mode, color) {
     const group = new THREE.Group();
-    const hull = new THREE.Mesh(new THREE.BoxGeometry(mode === "ferry" ? 1.9 : 1.45, .32, .68), this.meshMaterial(color));
+    const ferry = mode === "ferry";
+    const speedboat = mode === "speedboat";
+    const hull = new THREE.Mesh(new THREE.BoxGeometry(ferry ? 2.15 : 1.62, .34, ferry ? .78 : .68), this.meshMaterial(color, .38));
     hull.position.y = .24;
     hull.castShadow = true;
+    const lowerHull = new THREE.Mesh(
+      new THREE.ConeGeometry(ferry ? .5 : .4, ferry ? 2.2 : 1.7, 4),
+      this.meshMaterial(0x24464b, .5)
+    );
+    lowerHull.rotation.z = -Math.PI / 2;
+    lowerHull.position.set(.02, .08, 0);
     const cabin = new THREE.Mesh(
-      new THREE.BoxGeometry(mode === "ferry" ? 1.0 : .55, .55, .55),
+      new THREE.BoxGeometry(ferry ? 1.15 : .68, ferry ? .62 : .48, ferry ? .66 : .5),
       this.meshMaterial(0xfff2d9, .45)
     );
-    cabin.position.set(mode === "ferry" ? -.1 : -.2, .68, 0);
+    cabin.position.set(ferry ? -.12 : -.2, ferry ? .72 : .64, 0);
     cabin.castShadow = true;
     const bow = new THREE.Mesh(new THREE.ConeGeometry(.43, .78, 4), this.meshMaterial(color));
     bow.rotation.z = -Math.PI / 2;
-    bow.position.set(.95, .22, 0);
-    group.add(hull, cabin, bow);
+    bow.position.set(ferry ? 1.18 : .91, .23, 0);
+    group.add(lowerHull, hull, cabin, bow);
+    [-.22, .22].forEach(z => {
+      const boatWindow = new THREE.Mesh(new THREE.BoxGeometry(ferry ? .62 : .36, .16, .025), this.meshMaterial(0x4d9ba8, .16));
+      boatWindow.position.set(-.14, ferry ? .8 : .68, z);
+      group.add(boatWindow);
+    });
+    if (ferry) {
+      const upperDeck = new THREE.Mesh(new THREE.BoxGeometry(.86, .08, .7), this.meshMaterial(0xfff2d9, .52));
+      upperDeck.position.set(-.14, 1.06, 0);
+      const stack = new THREE.Mesh(new THREE.CylinderGeometry(.08, .1, .36, 10), this.meshMaterial(0xff9c62, .45));
+      stack.position.set(-.5, 1.28, 0);
+      group.add(upperDeck, stack);
+    }
+    if (speedboat) {
+      const windshield = new THREE.Mesh(new THREE.BoxGeometry(.05, .25, .46), this.meshMaterial(0x6cb7c3, .12));
+      windshield.position.set(.14, .78, 0);
+      const motor = new THREE.Mesh(new THREE.BoxGeometry(.26, .36, .35), this.meshMaterial(0x263330, .55));
+      motor.position.set(-.9, .28, 0);
+      group.add(windshield, motor);
+    }
     return group;
   }
 
@@ -641,8 +911,26 @@ class TerrainStage {
     body.position.y = .55;
     const head = new THREE.Mesh(new THREE.SphereGeometry(.22, 14, 10), this.meshMaterial(0xf0c59f));
     head.position.y = 1.05;
-    group.add(body, head);
+    const backpack = new THREE.Mesh(new THREE.BoxGeometry(.2, .42, .36), this.meshMaterial(0xff7867, .68));
+    backpack.position.set(-.17, .63, 0);
+    const hat = new THREE.Mesh(new THREE.CylinderGeometry(.26, .26, .05, 16), this.meshMaterial(0xffe0a3, .72));
+    hat.position.y = 1.25;
+    const hatTop = new THREE.Mesh(new THREE.CylinderGeometry(.14, .17, .16, 14), this.meshMaterial(0xffe0a3, .72));
+    hatTop.position.y = 1.34;
+    const armLeft = this.rodBetween(new THREE.Vector3(0, .78, -.12), new THREE.Vector3(.28, .46, -.18), .045, 0xf0c59f);
+    const armRight = this.rodBetween(new THREE.Vector3(0, .78, .12), new THREE.Vector3(.3, .48, .2), .045, 0xf0c59f);
+    group.add(body, head, backpack, hat, hatTop, armLeft, armRight);
     return group;
+  }
+
+  orientVehicle(vehicle, tangent, point) {
+    const up = this.surfaceNormal(point);
+    const forward = tangent.clone().projectOnPlane(up).normalize();
+    if (forward.lengthSq() < .001) forward.set(1, 0, 0);
+    const side = forward.clone().cross(up).normalize();
+    const correctedUp = side.clone().cross(forward).normalize();
+    const rotation = new THREE.Matrix4().makeBasis(forward, correctedUp, side);
+    vehicle.quaternion.setFromRotationMatrix(rotation);
   }
 
   createVehicle(mode) {
@@ -665,31 +953,49 @@ class TerrainStage {
     const stop = day.terrainStops[stepIndex];
     const mode = modeOverride || stop.mode;
     this.vehicle = this.createVehicle(mode);
-    const point = this.toLocal(stop.coord);
-    point.y = (mode === "flight" ? this.heightAt(stop.coord) + 1.2 :
-      (["boat", "ferry", "speedboat"].includes(mode) ? .42 : this.heightAt(stop.coord) + .48));
+    const point = mode === "flight"
+      ? this.surfacePoint(stop.coord, 1.45)
+      : (["boat", "ferry", "speedboat"].includes(mode)
+        ? this.surfacePoint(stop.coord, .28)
+        : this.terrainPoint(stop.coord, .42));
     this.vehicle.position.copy(point);
+    this.alignToSurface(this.vehicle, point);
     this.vehicle.castShadow = true;
     this.detailGroup.add(this.vehicle);
   }
 
   focusOverview(instant = false) {
+    const day = this.itinerary[this.dayIndex];
+    const visibleEntries = this.visibleTerrainEntries(day);
+    const localPoints = visibleEntries.map(({ stop }) => this.toLocal(stop.coord));
+    if (!localPoints.length) return;
+    const minX = Math.min(...localPoints.map(point => point.x));
+    const maxX = Math.max(...localPoints.map(point => point.x));
+    const minZ = Math.min(...localPoints.map(point => point.z));
+    const maxZ = Math.max(...localPoints.map(point => point.z));
+    const centerX = (minX + maxX) / 2;
+    const centerZ = (minZ + maxZ) / 2;
+    const spanX = Math.max(4.8, maxX - minX + 9.5);
+    const spanZ = Math.max(4.8, maxZ - minZ + 7.2);
     const verticalFov = THREE.MathUtils.degToRad(this.camera.fov);
     const horizontalFov = 2 * Math.atan(Math.tan(verticalFov / 2) * Math.max(this.camera.aspect, .32));
-    const framingAngle = Math.min(verticalFov, horizontalFov) / 2;
-    const distance = 21.5 / Math.tan(framingAngle) * 1.08;
-    const toPosition = new THREE.Vector3(0, distance * .65, distance * .76);
-    const toTarget = new THREE.Vector3(0, 0, 0);
+    const fitWidth = spanX / (2 * Math.tan(horizontalFov / 2));
+    const fitHeight = spanZ / (2 * Math.tan(verticalFov / 2));
+    const distance = Math.max(16, Math.max(fitWidth, fitHeight) * 1.06);
+    const toTarget = new THREE.Vector3(centerX, this.surfaceY(centerX, centerZ) + 1.55, centerZ);
+    const normal = this.surfaceNormal(toTarget);
+    const viewDirection = normal.multiplyScalar(.78).add(new THREE.Vector3(0, .18, .66)).normalize();
+    const toPosition = toTarget.clone().add(viewDirection.multiplyScalar(distance));
     this.setCameraTween(toPosition, toTarget, instant ? 1 : 1450);
   }
 
   focusStop(stepIndex, instant = false) {
     const stop = this.itinerary[this.dayIndex].terrainStops[stepIndex];
-    const point = this.toLocal(stop.coord);
-    point.y = this.heightAt(stop.coord);
+    const point = this.terrainPoint(stop.coord, .3);
     const distance = window.innerWidth < 720 ? 12.5 : 10.5;
-    const position = point.clone().add(new THREE.Vector3(distance * .72, distance * .78, distance));
-    const target = point.clone().add(new THREE.Vector3(0, .6, 0));
+    const normal = this.surfaceNormal(point);
+    const position = point.clone().add(normal.multiplyScalar(distance * .72)).add(new THREE.Vector3(0, distance * .22, distance * .58));
+    const target = point.clone().add(this.surfaceNormal(point).multiplyScalar(.6));
     this.setCameraTween(position, target, instant ? 1 : 1250);
   }
 
@@ -778,7 +1084,7 @@ class TerrainStage {
       const point = this.motion.curve.getPoint(eased);
       const tangent = this.motion.curve.getTangent(Math.min(.999, eased + .002));
       this.vehicle.position.copy(point);
-      this.vehicle.rotation.y = -Math.atan2(tangent.z, tangent.x);
+      this.orientVehicle(this.vehicle, tangent, point);
       if (t >= 1) this.finishMotion();
     }
   }

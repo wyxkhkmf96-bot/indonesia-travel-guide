@@ -288,14 +288,16 @@ body.intro-open .transport-card {
   inset: 0;
   width: 100%;
   height: 100%;
+  filter: drop-shadow(0 34px 70px rgba(0,0,0,.34));
 }
 
 .terrain-vignette {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(90deg, rgba(5,25,22,.72) 0%, rgba(5,25,22,.12) 16%, transparent 42%),
-    linear-gradient(0deg, rgba(5,25,22,.56), transparent 28%);
+    radial-gradient(ellipse 70% 86% at 52% 49%, transparent 50%, rgba(5,25,22,.12) 70%, rgba(5,25,22,.72) 100%),
+    linear-gradient(90deg, rgba(5,25,22,.68) 0%, rgba(5,25,22,.08) 14%, transparent 34%),
+    linear-gradient(0deg, rgba(5,25,22,.48), transparent 24%);
   pointer-events: none;
 }
 

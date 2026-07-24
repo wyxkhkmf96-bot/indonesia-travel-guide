@@ -9,7 +9,10 @@
   <meta property="og:description" content="沿着立体路线图，从东爪哇火山一路走到科莫多。每天的玩法、酒店、预算和注意事项都在一张行程舞台上。">
   <meta property="og:image" content="https://wyxkhkmf96-bot.github.io/indonesia-travel-guide/assets/indonesia/social-cover-v3.png">
   <title>一路向东｜印尼 10 天 9 晚</title>
-  <link rel="preload" as="image" href="assets/indonesia/bromo.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700;900&family=Playfair+Display:ital,wght@1,600&display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700;900&family=Playfair+Display:ital,wght@1,600&display=swap"></noscript>
   <link rel="stylesheet" href="style.css">
 </head>
 <body class="intro-open">
@@ -58,11 +61,11 @@
           </div>
           <div class="terrain-photo-strip">
             <figure>
-              <img id="terrain-photo-a" alt="">
+              <img id="terrain-photo-a" alt="" loading="lazy" decoding="async" fetchpriority="low">
               <figcaption id="terrain-photo-caption-a"></figcaption>
             </figure>
             <figure>
-              <img id="terrain-photo-b" alt="">
+              <img id="terrain-photo-b" alt="" loading="lazy" decoding="async" fetchpriority="low">
               <figcaption id="terrain-photo-caption-b"></figcaption>
             </figure>
           </div>
@@ -123,11 +126,11 @@
         <div class="story-layout">
           <div class="photo-stack" id="photo-stack">
             <figure class="photo-card photo-card-primary">
-              <img id="photo-primary" src="assets/indonesia/bromo.jpg" alt="布罗莫火山景观">
+              <img id="photo-primary" src="assets/indonesia/bromo.jpg" alt="布罗莫火山景观" loading="lazy" decoding="async">
               <figcaption id="photo-primary-caption">EAST JAVA · 抵达火山岛</figcaption>
             </figure>
             <figure class="photo-card photo-card-secondary">
-              <img id="photo-secondary" src="assets/maps/daily/day-01.jpg" alt="第一天路线地图">
+              <img id="photo-secondary" src="assets/maps/daily/day-01.jpg" alt="第一天路线地图" loading="lazy" decoding="async">
               <figcaption id="photo-secondary-caption">DAY 01 ROUTE</figcaption>
             </figure>
           </div>
@@ -228,6 +231,15 @@
   <script src="assets/vendor/d3.min.js"></script>
   <script src="assets/vendor/topojson-client.min.js"></script>
   <script src="app.js"></script>
-  <script type="module" src="terrain.js"></script>
+  <script type="module">
+    let terrainModule;
+    const loadTerrain = () => (terrainModule ||= import("./terrain.js"));
+    window.addEventListener("terrain-start", loadTerrain, { once: true });
+    if ("requestIdleCallback" in window) {
+      requestIdleCallback(loadTerrain, { timeout: 1500 });
+    } else {
+      setTimeout(loadTerrain, 350);
+    }
+  </script>
 </body>
 </html>

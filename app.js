@@ -377,10 +377,10 @@ class CuteGlobe {
 
   async loadWorld() {
     try {
-      const world = await fetch("assets/maps/countries-50m.json").then(response => {
+      const world = await (window.worldMapPromise ||= fetch("assets/maps/countries-50m.json").then(response => {
         if (!response.ok) throw new Error("World map unavailable");
         return response.json();
-      });
+      }));
       this.features = topojson.feature(world, world.objects.countries).features;
       this.features.forEach(feature => {
         feature._center = d3.geoCentroid(feature);
@@ -407,7 +407,7 @@ class CuteGlobe {
   resize() {
     const rect = this.canvas.getBoundingClientRect();
     if (!rect.width || !rect.height) return;
-    const ratio = Math.min(window.devicePixelRatio || 1, 2);
+    const ratio = Math.min(window.devicePixelRatio || 1, 1.5);
     this.width = rect.width;
     this.height = rect.height;
     this.canvas.width = Math.round(rect.width * ratio);
@@ -776,6 +776,11 @@ let wheelLocked = false;
 let touchStart = null;
 let transitionToken = 0;
 const globe = new CuteGlobe(document.querySelector("#globe-canvas"), days);
+const travelStage = document.querySelector(".stage");
+
+function resetStageViewport() {
+  if (travelStage) travelStage.scrollTop = 0;
+}
 
 const stopTransport = {
   road: ["🚐", "包车 / 陆路"],
@@ -835,7 +840,11 @@ function buildControls() {
     railButton.textContent = String(index + 1).padStart(2, "0");
     railButton.dataset.label = day.short;
     railButton.setAttribute("aria-label", `第${index + 1}天：${day.title}`);
-    railButton.addEventListener("click", () => setDay(index));
+    railButton.addEventListener("click", () => {
+      railButton.blur();
+      resetStageViewport();
+      setDay(index);
+    });
     elements.rail.appendChild(railButton);
   });
 }
@@ -919,9 +928,11 @@ async function showTerrainDay(index, crossRegion) {
   if (token !== transitionToken) return;
   document.body.classList.add("terrain-mode");
   document.body.classList.remove("globe-transition");
+  resetStageViewport();
 }
 
 function setDay(index, immediate = false) {
+  resetStageViewport();
   const next = Math.max(0, Math.min(days.length - 1, index));
   if (next === activeDay && !immediate) return;
   const previousRegion = days[activeDay]?.region;
@@ -940,12 +951,15 @@ function setDay(index, immediate = false) {
     updateContent(days[activeDay]);
     updateStage(days[activeDay]);
     elements.story.scrollTop = 0;
+    resetStageViewport();
     requestAnimationFrame(() => elements.story.classList.remove("is-changing"));
     showTerrainDay(activeDay, crossRegion);
   }, 260);
 }
 
 function enterExperience() {
+  window.dispatchEvent(new Event("terrain-start"));
+  resetStageViewport();
   document.body.classList.remove("intro-open");
   window.setTimeout(() => setDay(activeDay, true), 250);
 }

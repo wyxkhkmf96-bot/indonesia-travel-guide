@@ -85,7 +85,6 @@ class TerrainStage {
     this.currentRegion = null;
     this.worldReady = false;
     this.moving = false;
-    this.clock = new THREE.Clock();
     this.cameraTarget = new THREE.Vector3();
     this.cameraTween = null;
     this.motion = null;
@@ -94,6 +93,10 @@ class TerrainStage {
     this.userView = { zoom: 1, yaw: 0, pitch: 0, dragging: false, x: 0, y: 0 };
     this.baseCameraPosition = null;
     this.baseCameraTarget = null;
+    this.frame = null;
+    this.needsRender = true;
+    this.inViewport = true;
+    this.pageVisible = !document.hidden;
 
     this.renderer = new THREE.WebGLRenderer({
       canvas,
@@ -101,9 +104,9 @@ class TerrainStage {
       alpha: true,
       powerPreference: "high-performance"
     });
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
     this.renderer.shadowMap.enabled = true;
-    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    this.renderer.shadowMap.type = THREE.PCFShadowMap;
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.08;
@@ -122,11 +125,19 @@ class TerrainStage {
 
     this.resize = this.resize.bind(this);
     this.render = this.render.bind(this);
+    this.handleVisibility = this.handleVisibility.bind(this);
     this.resizeObserver = new ResizeObserver(this.resize);
     this.resizeObserver.observe(canvas);
+    this.intersectionObserver = new IntersectionObserver(entries => {
+      this.inViewport = entries[0]?.isIntersecting ?? true;
+      if (this.inViewport) this.requestRender();
+      else this.cancelRender();
+    }, { rootMargin: "120px" });
+    this.intersectionObserver.observe(canvas);
+    document.addEventListener("visibilitychange", this.handleVisibility);
     this.setupInteraction();
     this.resize();
-    this.render();
+    this.requestRender();
     this.ready = this.initialize().catch(error => this.fail(error));
   }
 
@@ -137,7 +148,7 @@ class TerrainStage {
     const key = new THREE.DirectionalLight(0xfff0d2, 3.8);
     key.position.set(-12, 28, 16);
     key.castShadow = true;
-    key.shadow.mapSize.set(2048, 2048);
+    key.shadow.mapSize.set(1024, 1024);
     key.shadow.camera.left = -28;
     key.shadow.camera.right = 28;
     key.shadow.camera.top = 28;
@@ -170,10 +181,10 @@ class TerrainStage {
 
   async initialize() {
     this.setProgress(8, "正在读取真实岛屿轮廓");
-    const world = await fetch("assets/maps/countries-50m.json").then(response => {
+    const world = await (window.worldMapPromise ||= fetch("assets/maps/countries-50m.json").then(response => {
       if (!response.ok) throw new Error("Terrain geography unavailable");
       return response.json();
-    });
+    }));
     const countries = window.topojson.feature(world, world.objects.countries).features;
     this.land = window.topojson.feature(world, world.objects.land);
     this.indonesia = countries.find(feature => feature.properties?.name === "Indonesia");
@@ -196,6 +207,7 @@ class TerrainStage {
       if (this.currentRegion === "arrival") this.focusArrivalGlobe(true, false);
       else this.focusOverview(true, false);
     }
+    this.requestRender();
   }
 
   setupInteraction() {
@@ -265,6 +277,30 @@ class TerrainStage {
     this.cameraTarget.copy(this.baseCameraTarget);
     this.camera.position.copy(this.baseCameraTarget).add(offset);
     this.camera.lookAt(this.cameraTarget);
+    this.requestRender();
+  }
+
+  canRender() {
+    return this.pageVisible && this.inViewport;
+  }
+
+  cancelRender() {
+    if (!this.frame) return;
+    cancelAnimationFrame(this.frame);
+    this.frame = null;
+  }
+
+  handleVisibility() {
+    this.pageVisible = !document.hidden;
+    if (this.pageVisible) this.requestRender();
+    else this.cancelRender();
+  }
+
+  requestRender() {
+    this.needsRender = true;
+    if (!this.frame && this.canRender()) {
+      this.frame = requestAnimationFrame(this.render);
+    }
   }
 
   disposeGroup(group) {
@@ -396,7 +432,7 @@ class TerrainStage {
     this.disposeGroup(this.routeGroup);
 
     const ocean = new THREE.Mesh(
-      new THREE.SphereGeometry(14, 128, 96),
+      new THREE.SphereGeometry(14, 96, 64),
       new THREE.MeshPhysicalMaterial({
         color: 0x43a9b4,
         roughness: .34,
@@ -474,7 +510,7 @@ class TerrainStage {
     });
 
     const atmosphere = new THREE.Mesh(
-      new THREE.SphereGeometry(14.42, 96, 64),
+      new THREE.SphereGeometry(14.42, 72, 48),
       new THREE.MeshBasicMaterial({
         color: 0x8cecf0,
         side: THREE.BackSide,
@@ -689,7 +725,7 @@ class TerrainStage {
       clearcoatRoughness: .28
     });
 
-    const ocean = new THREE.Mesh(new THREE.SphereGeometry(GLOBE_RADIUS, 128, 96), oceanMaterial);
+    const ocean = new THREE.Mesh(new THREE.SphereGeometry(GLOBE_RADIUS, 96, 64), oceanMaterial);
     ocean.position.y = GLOBE_CENTER_Y;
     ocean.receiveShadow = true;
     globe.add(ocean);
@@ -708,7 +744,7 @@ class TerrainStage {
     globe.add(grid);
 
     const atmosphere = new THREE.Mesh(
-      new THREE.SphereGeometry(GLOBE_RADIUS + .42, 96, 64),
+      new THREE.SphereGeometry(GLOBE_RADIUS + .42, 72, 48),
       new THREE.MeshBasicMaterial({
         color: config.color,
         side: THREE.BackSide,
@@ -915,6 +951,7 @@ class TerrainStage {
     image.onload = () => {
       drawFrame(image);
       texture.needsUpdate = true;
+      this.requestRender();
     };
     image.src = photo[0];
 
@@ -1386,6 +1423,7 @@ class TerrainStage {
       start: performance.now(),
       duration
     };
+    this.requestRender();
   }
 
   async setDay(index, options = {}) {
@@ -1437,6 +1475,7 @@ class TerrainStage {
       resolve: null
     };
     this.focusStop(targetIndex);
+    this.requestRender();
 
     return new Promise(resolve => {
       this.motion.resolve = resolve;
@@ -1476,10 +1515,17 @@ class TerrainStage {
   }
 
   render() {
+    this.frame = null;
+    if (!this.canRender()) return;
     const now = performance.now();
     this.updateTweens(now);
-    this.renderer.render(this.scene, this.camera);
-    requestAnimationFrame(this.render);
+    if (this.needsRender || this.cameraTween || this.motion) {
+      this.renderer.render(this.scene, this.camera);
+      this.needsRender = false;
+    }
+    if (this.cameraTween || this.motion) {
+      this.frame = requestAnimationFrame(this.render);
+    }
   }
 }
 

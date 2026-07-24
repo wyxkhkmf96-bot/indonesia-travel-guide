@@ -846,6 +846,12 @@ function updateContent(day) {
   elements.secondary.src = day.photos[1][0];
   elements.secondary.alt = day.photos[1][2];
   elements.secondaryCaption.textContent = day.photos[1][1];
+  elements.schedule.innerHTML = day.schedule.map(item => `
+    <li>
+      <time>${item[0]}</time>
+      <div><b>${item[1]}</b><p>${item[2]}</p></div>
+    </li>
+  `).join("");
   elements.hotelName.textContent = day.hotel[0];
   elements.hotelCopy.textContent = day.hotel[1];
   elements.hotelPrice.textContent = day.hotel[2];
@@ -854,7 +860,14 @@ function updateContent(day) {
   elements.cost.textContent = day.cost[0];
   elements.costNote.textContent = day.cost[1];
   elements.current.textContent = String(activeDay + 1).padStart(2, "0");
-  renderStop(0);
+  activeStop = 0;
+  const dailyModes = [...new Set(day.terrainStops.map(stop => stopTransport[stop.mode]?.[1]).filter(Boolean))];
+  elements.transportIcon.textContent = day.transport.icon;
+  elements.transportLabel.textContent = day.transport.label;
+  elements.transportDetail.textContent = dailyModes.join(" · ") || day.transport.detail;
+  elements.transportCard.classList.remove("is-moving");
+  void elements.transportCard.offsetWidth;
+  if (!document.body.classList.contains("intro-open")) elements.transportCard.classList.add("is-moving");
 }
 
 function updateStage(day) {
@@ -974,10 +987,8 @@ window.addEventListener("keydown", event => {
     return;
   }
   if (planning.classList.contains("open")) return;
-  if (event.key === "ArrowRight") moveStop(1);
-  if (event.key === "ArrowLeft") moveStop(-1);
-  if (event.key === "ArrowDown") setDay(activeDay + 1);
-  if (event.key === "ArrowUp") setDay(activeDay - 1);
+  if (event.key === "ArrowRight" || event.key === "ArrowDown") setDay(activeDay + 1);
+  if (event.key === "ArrowLeft" || event.key === "ArrowUp") setDay(activeDay - 1);
 });
 
 window.addEventListener("wheel", event => {

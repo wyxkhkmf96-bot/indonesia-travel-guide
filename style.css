@@ -270,12 +270,15 @@ body.intro-open .transport-card {
 
 .terrain-stage {
   position: absolute;
-  inset: 0;
+  top: 72px;
+  right: 0;
+  bottom: 0;
+  left: 41%;
   z-index: 3;
   overflow: hidden;
   opacity: 0;
   transform: scale(.72);
-  transform-origin: 68% 50%;
+  transform-origin: right center;
   pointer-events: none;
   transition: opacity .7s ease, transform 1.55s cubic-bezier(.16,.82,.22,1), filter .8s ease;
 }
@@ -291,8 +294,8 @@ body.intro-open .transport-card {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(90deg, rgba(5,25,22,.96) 0%, rgba(5,25,22,.78) 22%, rgba(5,25,22,.14) 46%, transparent 72%),
-    linear-gradient(0deg, rgba(5,25,22,.78), transparent 34%);
+    linear-gradient(90deg, rgba(5,25,22,.72) 0%, rgba(5,25,22,.12) 16%, transparent 42%),
+    linear-gradient(0deg, rgba(5,25,22,.56), transparent 28%);
   pointer-events: none;
 }
 
@@ -303,6 +306,46 @@ body.intro-open .transport-card {
   color: rgba(255,255,255,.34);
   font-size: 8px;
   letter-spacing: .08em;
+}
+
+.route-legend {
+  position: absolute;
+  z-index: 4;
+  right: 28px;
+  bottom: 38px;
+  display: flex;
+  gap: 16px;
+  padding: 9px 12px;
+  border: 1px solid rgba(255,255,255,.16);
+  border-radius: 999px;
+  color: rgba(255,255,255,.62);
+  background: rgba(7,31,29,.66);
+  backdrop-filter: blur(12px);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: .08em;
+}
+
+.route-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.route-legend i {
+  display: inline-block;
+  width: 24px;
+  height: 3px;
+}
+
+.road-line { background: #ff7867; }
+
+.boat-line {
+  background: repeating-linear-gradient(90deg, #6bd6e3 0 4px, transparent 4px 8px);
+}
+
+.flight-line-3d {
+  background: repeating-linear-gradient(90deg, #c3a7ff 0 8px, transparent 8px 13px);
 }
 
 .terrain-loading {
@@ -1103,7 +1146,12 @@ body.terrain-unavailable .globe-viewport {
 
 .stop-progress,
 .step-controls {
-  display: none;
+  display: none !important;
+}
+
+body.terrain-mode .day-story {
+  left: clamp(64px, 5vw, 98px);
+  width: min(610px, 35vw);
 }
 
 body.terrain-mode .photo-stack {
@@ -1121,7 +1169,7 @@ body.terrain-mode .story-layout {
 }
 
 body.terrain-mode .day-copy {
-  width: min(380px, 100%);
+  width: 100%;
   padding: 18px;
   border: 1px solid rgba(255,255,255,.16);
   border-radius: 20px;
@@ -1151,7 +1199,7 @@ body.terrain-mode .schedule p {
   margin-top: 18px;
 }
 
-body.terrain-mode .stop-progress { display: flex; }
+body.terrain-mode .stop-progress { display: none; }
 
 .stop-progress span {
   flex: 0 0 auto;
@@ -1184,7 +1232,7 @@ body.terrain-mode .stop-progress { display: flex; }
   margin-top: 10px;
 }
 
-body.terrain-mode .step-controls { display: grid; }
+body.terrain-mode .step-controls { display: none; }
 
 .step-controls button {
   min-height: 36px;
@@ -1257,6 +1305,19 @@ body.terrain-mode .step-controls { display: grid; }
   }
   .transport-card > b { width: 32px; height: 32px; flex-basis: 32px; }
 
+  .terrain-stage {
+    top: 58px;
+    left: 44%;
+  }
+
+  .route-legend {
+    right: 10px;
+    bottom: 48px;
+    flex-direction: column;
+    gap: 5px;
+    padding: 7px 9px;
+  }
+
   .day-story {
     left: 18px;
     right: 18px;
@@ -1267,6 +1328,27 @@ body.terrain-mode .step-controls { display: grid; }
     padding-right: 4px;
     scrollbar-width: none;
   }
+
+  body.terrain-mode .day-story {
+    left: 12px;
+    right: auto;
+    top: 72px;
+    bottom: 52px;
+    width: calc(44% - 22px);
+  }
+
+  body.terrain-mode .day-heading h2 { font-size: clamp(26px, 8vw, 34px); }
+  body.terrain-mode .day-route { max-width: 100%; font-size: 8px; }
+  body.terrain-mode .story-layout { margin-top: 12px; }
+  body.terrain-mode .day-copy { padding: 11px; border-radius: 14px; }
+  body.terrain-mode .main-project h3 { font-size: 12px; }
+  body.terrain-mode .schedule li {
+    grid-template-columns: 1fr;
+    gap: 3px;
+    padding-top: 9px;
+  }
+  body.terrain-mode .schedule p { font-size: 8px; }
+  body.terrain-mode .day-bottom article { padding: 10px; }
 
   .day-story::-webkit-scrollbar { display: none; }
   .day-heading h2 { font-size: 38px; }

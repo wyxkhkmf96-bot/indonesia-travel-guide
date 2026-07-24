@@ -101,8 +101,8 @@ class TerrainStage {
     this.renderer.toneMappingExposure = 1.08;
 
     this.scene = new THREE.Scene();
-    this.scene.fog = new THREE.FogExp2(0x0a2926, .016);
-    this.camera = new THREE.PerspectiveCamera(34, 1, .1, 180);
+    this.scene.fog = new THREE.FogExp2(0x0a2926, .0045);
+    this.camera = new THREE.PerspectiveCamera(34, 1, .1, 420);
     this.camera.position.set(0, 23, 28);
     this.camera.lookAt(this.cameraTarget);
 
@@ -182,6 +182,7 @@ class TerrainStage {
     this.renderer.setSize(rect.width, rect.height, false);
     this.camera.aspect = rect.width / rect.height;
     this.camera.updateProjectionMatrix();
+    if (this.worldReady && this.currentRegion && !this.moving) this.focusOverview(true);
   }
 
   disposeGroup(group) {
@@ -445,7 +446,7 @@ class TerrainStage {
     const texture = new THREE.CanvasTexture(canvas);
     texture.colorSpace = THREE.SRGBColorSpace;
     const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true, depthTest: false }));
-    sprite.scale.set(5.4, 1.22, 1);
+    sprite.scale.set(4.25, .96, 1);
     return sprite;
   }
 
@@ -530,17 +531,28 @@ class TerrainStage {
       const label = this.createLabel(day.schedule[index][1], accent);
       label.position.copy(marker.position);
       label.position.y += 2.2;
-      label.visible = index === 0;
+      label.visible = true;
       this.labelSprites.push(label);
       this.routeGroup.add(label);
       if (index > 0) {
         const mode = stop.mode;
+        const previousStop = day.terrainStops[index - 1];
         this.routeGroup.add(this.createRouteSegment(
-          day.terrainStops[index - 1],
+          previousStop,
           stop,
           mode,
           MODE_COLORS[mode] || REGION_CONFIG[day.region].color
         ));
+        const routePoints = this.routePoints(previousStop, stop, mode);
+        const routeCurve = new THREE.CatmullRomCurve3(routePoints);
+        const vehicle = this.createVehicle(mode);
+        const vehiclePoint = routeCurve.getPoint(.52);
+        const tangent = routeCurve.getTangent(.53);
+        vehicle.position.copy(vehiclePoint);
+        vehicle.rotation.y = -Math.atan2(tangent.z, tangent.x);
+        vehicle.scale.multiplyScalar(.78);
+        vehicle.userData.routeVehicle = true;
+        this.routeGroup.add(vehicle);
       }
     });
   }
@@ -662,7 +674,11 @@ class TerrainStage {
   }
 
   focusOverview(instant = false) {
-    const toPosition = new THREE.Vector3(0, 24, 28);
+    const verticalFov = THREE.MathUtils.degToRad(this.camera.fov);
+    const horizontalFov = 2 * Math.atan(Math.tan(verticalFov / 2) * Math.max(this.camera.aspect, .32));
+    const framingAngle = Math.min(verticalFov, horizontalFov) / 2;
+    const distance = 21.5 / Math.tan(framingAngle) * 1.08;
+    const toPosition = new THREE.Vector3(0, distance * .65, distance * .76);
     const toTarget = new THREE.Vector3(0, 0, 0);
     this.setCameraTween(toPosition, toTarget, instant ? 1 : 1450);
   }
@@ -698,15 +714,11 @@ class TerrainStage {
     this.dayIndex = index;
     this.stepIndex = 0;
     if (regionChanged) await this.buildRegion(day.region);
+    this.disposeGroup(this.detailGroup);
+    this.vehicle = null;
     this.buildDayRoute(day);
-    this.placeVehicleForStep(0);
-    this.labelSprites.forEach((label, labelIndex) => { label.visible = labelIndex === 0; });
-    if (regionChanged) {
-      this.focusOverview(true);
-      window.setTimeout(() => this.focusStop(0), options.instant ? 40 : 620);
-    } else {
-      this.focusStop(0, options.instant);
-    }
+    this.labelSprites.forEach(label => { label.visible = true; });
+    this.focusOverview(options.instant);
     document.querySelector("#terrain-loading")?.classList.add("ready");
     return { regionChanged };
   }

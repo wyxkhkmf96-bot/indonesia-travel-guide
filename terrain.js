@@ -680,10 +680,37 @@ class TerrainStage {
     );
     head.position.y = .84;
     head.castShadow = true;
+    const badgeCanvas = document.createElement("canvas");
+    badgeCanvas.width = 128;
+    badgeCanvas.height = 128;
+    const badgeContext = badgeCanvas.getContext("2d");
+    badgeContext.fillStyle = "#fff8e8";
+    badgeContext.beginPath();
+    badgeContext.arc(64, 64, 52, 0, Math.PI * 2);
+    badgeContext.fill();
+    badgeContext.strokeStyle = `#${accent.toString(16).padStart(6, "0")}`;
+    badgeContext.lineWidth = 10;
+    badgeContext.stroke();
+    badgeContext.fillStyle = "#12332e";
+    badgeContext.font = "800 54px sans-serif";
+    badgeContext.textAlign = "center";
+    badgeContext.textBaseline = "middle";
+    badgeContext.fillText(String(number).padStart(2, "0"), 64, 67);
+    const badgeTexture = new THREE.CanvasTexture(badgeCanvas);
+    badgeTexture.colorSpace = THREE.SRGBColorSpace;
+    const badge = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: badgeTexture,
+      transparent: true,
+      depthTest: false,
+      depthWrite: false
+    }));
+    badge.position.set(number % 2 ? -.38 : .38, 1.35 + (number % 3) * .12, 0);
+    badge.scale.set(.72, .72, 1);
+    badge.renderOrder = 25;
     group.position.copy(point);
     this.alignToSurface(group, point);
     group.userData.number = number;
-    group.add(pin, head);
+    group.add(pin, head, badge);
     return group;
   }
 
@@ -742,19 +769,11 @@ class TerrainStage {
     this.disposeGroup(this.routeGroup);
     this.labelSprites = [];
     this.photoSprites = [];
-    const accent = `#${REGION_CONFIG[day.region].color.toString(16).padStart(6, "0")}`;
 
     const visibleEntries = this.visibleTerrainEntries(day);
     visibleEntries.forEach(({ stop, index }, visibleIndex) => {
       const marker = this.createMarker(index + 1, stop.coord, REGION_CONFIG[day.region].color);
       this.routeGroup.add(marker);
-      const label = this.createLabel(day.schedule[index][1], accent);
-      const markerNormal = this.surfaceNormal(marker.position);
-      label.position.copy(marker.position).add(markerNormal.multiplyScalar(1.95));
-      label.position.y += .65;
-      label.visible = true;
-      this.labelSprites.push(label);
-      this.routeGroup.add(label);
       if (visibleIndex > 0) {
         const mode = stop.mode;
         const previousStop = visibleEntries[visibleIndex - 1].stop;
@@ -775,14 +794,6 @@ class TerrainStage {
         vehicle.userData.routeVehicle = true;
         this.routeGroup.add(vehicle);
       }
-    });
-
-    day.photos.slice(0, 2).forEach((photo, index) => {
-      const entry = visibleEntries[Math.min(visibleEntries.length - 1, index + 1)] || visibleEntries[0];
-      if (!entry) return;
-      const photoCard = this.createPhotoCard(photo, entry.stop.coord, index);
-      this.photoSprites.push(photoCard);
-      this.routeGroup.add(photoCard);
     });
   }
 

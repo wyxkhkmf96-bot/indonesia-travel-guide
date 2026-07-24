@@ -48,9 +48,28 @@
       <div class="ambient ambient-a" aria-hidden="true"></div>
       <div class="ambient ambient-b" aria-hidden="true"></div>
 
-      <div class="terrain-stage" id="terrain-stage" aria-hidden="true">
+      <div class="terrain-stage" id="terrain-stage" aria-label="当天 3D 地球路线">
         <canvas class="terrain-canvas" id="terrain-canvas"></canvas>
         <div class="terrain-vignette"></div>
+        <div class="arrival-route-map" id="arrival-route-map">
+          <img src="assets/maps/daily/day-01.jpg" alt="上海浦东飞往泗水的路线图">
+        </div>
+        <aside class="terrain-sidecar" aria-label="当天景点索引与实景图">
+          <div class="terrain-stop-key">
+            <small>DAY ROUTE · 当天点位</small>
+            <ol id="terrain-stop-key"></ol>
+          </div>
+          <div class="terrain-photo-strip">
+            <figure>
+              <img id="terrain-photo-a" alt="">
+              <figcaption id="terrain-photo-caption-a"></figcaption>
+            </figure>
+            <figure>
+              <img id="terrain-photo-b" alt="">
+              <figcaption id="terrain-photo-caption-b"></figcaption>
+            </figure>
+          </div>
+        </aside>
         <div class="terrain-loading" id="terrain-loading">
           <i></i><span>正在搭建 3D 岛屿沙盘</span><b id="terrain-progress">0%</b>
         </div>

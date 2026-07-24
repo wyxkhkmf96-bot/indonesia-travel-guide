@@ -758,6 +758,11 @@ const elements = {
   transportIcon: document.querySelector("#transport-icon"),
   transportLabel: document.querySelector("#transport-label"),
   transportDetail: document.querySelector("#transport-detail"),
+  terrainStopKey: document.querySelector("#terrain-stop-key"),
+  terrainPhotoA: document.querySelector("#terrain-photo-a"),
+  terrainPhotoCaptionA: document.querySelector("#terrain-photo-caption-a"),
+  terrainPhotoB: document.querySelector("#terrain-photo-b"),
+  terrainPhotoCaptionB: document.querySelector("#terrain-photo-caption-b"),
   stopCount: document.querySelector("#stop-count"),
   stopProgress: document.querySelector("#stop-progress-bar"),
   previousStop: document.querySelector("#previous-stop"),
@@ -836,6 +841,7 @@ function buildControls() {
 }
 
 function updateContent(day) {
+  document.body.classList.toggle("arrival-map-mode", activeDay === 0);
   elements.date.textContent = day.date;
   elements.title.textContent = day.title;
   elements.route.textContent = day.route;
@@ -846,6 +852,15 @@ function updateContent(day) {
   elements.secondary.src = day.photos[1][0];
   elements.secondary.alt = day.photos[1][2];
   elements.secondaryCaption.textContent = day.photos[1][1];
+  elements.terrainStopKey.innerHTML = day.schedule.map((item, index) => `
+    <li><b>${String(index + 1).padStart(2, "0")}</b><span>${item[1]}</span></li>
+  `).join("");
+  elements.terrainPhotoA.src = day.photos[0][0];
+  elements.terrainPhotoA.alt = day.photos[0][2];
+  elements.terrainPhotoCaptionA.textContent = day.photos[0][1];
+  elements.terrainPhotoB.src = day.photos[1][0];
+  elements.terrainPhotoB.alt = day.photos[1][2];
+  elements.terrainPhotoCaptionB.textContent = day.photos[1][1];
   elements.schedule.innerHTML = day.schedule.map(item => `
     <li>
       <time>${item[0]}</time>

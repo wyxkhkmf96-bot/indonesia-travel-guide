@@ -285,8 +285,8 @@ body.intro-open .transport-card {
 
 .terrain-canvas {
   position: absolute;
-  inset: 0;
-  width: 100%;
+  inset: 0 0 0 230px;
+  width: calc(100% - 230px);
   height: 100%;
   filter: drop-shadow(0 34px 70px rgba(0,0,0,.34));
   cursor: grab;
@@ -303,6 +303,144 @@ body.intro-open .transport-card {
     linear-gradient(90deg, rgba(5,25,22,.68) 0%, rgba(5,25,22,.08) 14%, transparent 34%),
     linear-gradient(0deg, rgba(5,25,22,.48), transparent 24%);
   pointer-events: none;
+}
+
+.arrival-route-map {
+  position: absolute;
+  z-index: 12;
+  inset: 24px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.24);
+  border-radius: 26px;
+  background: #d7dcdd;
+  box-shadow: 0 28px 80px rgba(0,0,0,.32);
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(.98);
+  transition: opacity .45s ease, transform .65s ease, visibility .45s ease;
+}
+
+.arrival-route-map img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+body.arrival-map-mode .arrival-route-map {
+  opacity: 1;
+  visibility: visible;
+  transform: scale(1);
+}
+
+body.arrival-map-mode .terrain-canvas,
+body.arrival-map-mode .terrain-vignette,
+body.arrival-map-mode .terrain-sidecar,
+body.arrival-map-mode .route-legend,
+body.arrival-map-mode .terrain-controls-hint,
+body.arrival-map-mode .terrain-source,
+body.arrival-map-mode .region-legend,
+body.arrival-map-mode .transport-card,
+body.arrival-map-mode .scene-index {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.terrain-sidecar {
+  position: absolute;
+  z-index: 6;
+  top: 24px;
+  bottom: 72px;
+  left: 18px;
+  width: 194px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  pointer-events: none;
+}
+
+.terrain-stop-key {
+  padding: 13px;
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 16px;
+  background: rgba(7,31,29,.8);
+  box-shadow: 0 18px 42px rgba(0,0,0,.22);
+  backdrop-filter: blur(12px);
+}
+
+.terrain-stop-key small {
+  color: var(--day-accent);
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: .12em;
+}
+
+.terrain-stop-key ol {
+  display: grid;
+  gap: 8px;
+  margin: 11px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.terrain-stop-key li {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  color: rgba(255,255,255,.78);
+  font-size: 8px;
+  line-height: 1.35;
+}
+
+.terrain-stop-key b {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  color: #12332e;
+  background: var(--day-accent);
+  font-size: 8px;
+}
+
+.terrain-photo-strip {
+  display: grid;
+  gap: 10px;
+  min-height: 0;
+}
+
+.terrain-photo-strip figure {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 16 / 10;
+  margin: 0;
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 15px;
+  background: rgba(7,31,29,.76);
+  box-shadow: 0 18px 42px rgba(0,0,0,.25);
+}
+
+.terrain-photo-strip img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.terrain-photo-strip figcaption {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 22px 10px 9px;
+  color: #fff9ec;
+  background: linear-gradient(transparent, rgba(3,18,17,.9));
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: .05em;
 }
 
 .terrain-source {
@@ -1332,6 +1470,18 @@ body.terrain-mode .step-controls { display: none; }
   .terrain-stage {
     top: 58px;
     left: 44%;
+  }
+
+  .terrain-canvas {
+    inset: 0;
+    width: 100%;
+  }
+
+  .terrain-sidecar { display: none; }
+
+  .arrival-route-map {
+    inset: 10px;
+    border-radius: 16px;
   }
 
   .route-legend {

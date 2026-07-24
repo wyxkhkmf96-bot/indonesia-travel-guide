@@ -91,6 +91,9 @@ class TerrainStage {
     this.motion = null;
     this.labelSprites = [];
     this.photoSprites = [];
+    this.userView = { zoom: 1, yaw: 0, pitch: 0, dragging: false, x: 0, y: 0 };
+    this.baseCameraPosition = null;
+    this.baseCameraTarget = null;
 
     this.renderer = new THREE.WebGLRenderer({
       canvas,
@@ -121,6 +124,7 @@ class TerrainStage {
     this.render = this.render.bind(this);
     this.resizeObserver = new ResizeObserver(this.resize);
     this.resizeObserver.observe(canvas);
+    this.setupInteraction();
     this.resize();
     this.render();
     this.ready = this.initialize().catch(error => this.fail(error));
@@ -187,7 +191,76 @@ class TerrainStage {
     this.renderer.setSize(rect.width, rect.height, false);
     this.camera.aspect = rect.width / rect.height;
     this.camera.updateProjectionMatrix();
-    if (this.worldReady && this.currentRegion && !this.moving) this.focusOverview(true);
+    if (this.worldReady && this.currentRegion && !this.moving) this.focusOverview(true, false);
+  }
+
+  setupInteraction() {
+    this.canvas.addEventListener("wheel", event => {
+      event.preventDefault();
+      event.stopPropagation();
+      if (Math.abs(event.deltaX) > Math.abs(event.deltaY) * .45) {
+        this.userView.yaw = THREE.MathUtils.clamp(this.userView.yaw - event.deltaX * .00055, -.2, .2);
+      } else {
+        this.userView.zoom = THREE.MathUtils.clamp(
+          this.userView.zoom * Math.exp(event.deltaY * .00042),
+          .86,
+          1.18
+        );
+      }
+      this.applyUserView();
+    }, { passive: false });
+
+    this.canvas.addEventListener("pointerdown", event => {
+      this.userView.dragging = true;
+      this.userView.x = event.clientX;
+      this.userView.y = event.clientY;
+      this.canvas.classList.add("is-dragging");
+      this.canvas.setPointerCapture?.(event.pointerId);
+    });
+
+    this.canvas.addEventListener("pointermove", event => {
+      if (!this.userView.dragging) return;
+      const dx = event.clientX - this.userView.x;
+      const dy = event.clientY - this.userView.y;
+      this.userView.x = event.clientX;
+      this.userView.y = event.clientY;
+      this.userView.yaw = THREE.MathUtils.clamp(this.userView.yaw - dx * .0022, -.2, .2);
+      this.userView.pitch = THREE.MathUtils.clamp(this.userView.pitch + dy * .0017, -.13, .13);
+      this.applyUserView();
+    });
+
+    const finishDrag = event => {
+      this.userView.dragging = false;
+      this.canvas.classList.remove("is-dragging");
+      if (event?.pointerId !== undefined) this.canvas.releasePointerCapture?.(event.pointerId);
+    };
+    this.canvas.addEventListener("pointerup", finishDrag);
+    this.canvas.addEventListener("pointercancel", finishDrag);
+    this.canvas.addEventListener("dblclick", event => {
+      event.preventDefault();
+      event.stopPropagation();
+      this.resetUserView();
+      this.applyUserView();
+    });
+  }
+
+  resetUserView() {
+    this.userView.zoom = 1;
+    this.userView.yaw = 0;
+    this.userView.pitch = 0;
+  }
+
+  applyUserView() {
+    if (!this.baseCameraPosition || !this.baseCameraTarget) return;
+    this.cameraTween = null;
+    const offset = this.baseCameraPosition.clone().sub(this.baseCameraTarget);
+    const spherical = new THREE.Spherical().setFromVector3(offset);
+    spherical.theta += this.userView.yaw;
+    spherical.phi = THREE.MathUtils.clamp(spherical.phi + this.userView.pitch, .28, 1.42);
+    offset.setFromSpherical(spherical).multiplyScalar(this.userView.zoom);
+    this.cameraTarget.copy(this.baseCameraTarget);
+    this.camera.position.copy(this.baseCameraTarget).add(offset);
+    this.camera.lookAt(this.cameraTarget);
   }
 
   disposeGroup(group) {
@@ -501,7 +574,7 @@ class TerrainStage {
     const texture = new THREE.CanvasTexture(canvas);
     texture.colorSpace = THREE.SRGBColorSpace;
     const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true, depthTest: false }));
-    sprite.scale.set(4.25, .96, 1);
+    sprite.scale.set(2.9, .66, 1);
     return sprite;
   }
 
@@ -555,7 +628,7 @@ class TerrainStage {
       depthTest: false,
       depthWrite: false
     }));
-    sprite.scale.set(6.2, 4.05, 1);
+    sprite.scale.set(3.65, 2.4, 1);
     sprite.renderOrder = 30;
 
     const image = new Image();
@@ -569,8 +642,8 @@ class TerrainStage {
     const anchor = this.terrainPoint(coordinate, .28);
     const normal = this.surfaceNormal(anchor);
     const cardPosition = anchor.clone()
-      .add(normal.multiplyScalar(3.7 + index * .35))
-      .add(new THREE.Vector3(index ? 3.2 : -3.2, 2.2 + index * .45, index ? -.2 : .25));
+      .add(normal.multiplyScalar(3 + index * .2))
+      .add(new THREE.Vector3(index ? 4.8 : -4.8, index ? 1 : 3.2, index ? -.1 : .2));
     sprite.position.copy(cardPosition);
 
     const lineGeometry = new THREE.BufferGeometry().setFromPoints([
@@ -964,7 +1037,7 @@ class TerrainStage {
     this.detailGroup.add(this.vehicle);
   }
 
-  focusOverview(instant = false) {
+  focusOverview(instant = false, resetInteraction = true) {
     const day = this.itinerary[this.dayIndex];
     const visibleEntries = this.visibleTerrainEntries(day);
     const localPoints = visibleEntries.map(({ stop }) => this.toLocal(stop.coord));
@@ -975,17 +1048,28 @@ class TerrainStage {
     const maxZ = Math.max(...localPoints.map(point => point.z));
     const centerX = (minX + maxX) / 2;
     const centerZ = (minZ + maxZ) / 2;
-    const spanX = Math.max(4.8, maxX - minX + 9.5);
-    const spanZ = Math.max(4.8, maxZ - minZ + 7.2);
+    const spanX = Math.max(8, maxX - minX + 14);
+    const spanZ = Math.max(7, maxZ - minZ + 10.5);
     const verticalFov = THREE.MathUtils.degToRad(this.camera.fov);
     const horizontalFov = 2 * Math.atan(Math.tan(verticalFov / 2) * Math.max(this.camera.aspect, .32));
     const fitWidth = spanX / (2 * Math.tan(horizontalFov / 2));
     const fitHeight = spanZ / (2 * Math.tan(verticalFov / 2));
-    const distance = Math.max(16, Math.max(fitWidth, fitHeight) * 1.06);
+    const distance = Math.max(24, Math.max(fitWidth, fitHeight) * 1.12);
     const toTarget = new THREE.Vector3(centerX, this.surfaceY(centerX, centerZ) + 1.55, centerZ);
     const normal = this.surfaceNormal(toTarget);
     const viewDirection = normal.multiplyScalar(.78).add(new THREE.Vector3(0, .18, .66)).normalize();
     const toPosition = toTarget.clone().add(viewDirection.multiplyScalar(distance));
+    if (resetInteraction) this.resetUserView();
+    this.baseCameraPosition = toPosition.clone();
+    this.baseCameraTarget = toTarget.clone();
+    if (!resetInteraction && (
+      this.userView.zoom !== 1 ||
+      this.userView.yaw !== 0 ||
+      this.userView.pitch !== 0
+    )) {
+      this.applyUserView();
+      return;
+    }
     this.setCameraTween(toPosition, toTarget, instant ? 1 : 1450);
   }
 

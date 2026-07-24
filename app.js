@@ -993,6 +993,7 @@ window.addEventListener("keydown", event => {
 
 window.addEventListener("wheel", event => {
   if (document.body.classList.contains("intro-open") || planning.classList.contains("open")) return;
+  if (event.target.closest?.("#terrain-stage")) return;
   if (window.innerWidth < 721 && elements.story.scrollHeight > elements.story.clientHeight) return;
   event.preventDefault();
   if (wheelLocked || Math.abs(event.deltaY) < 12) return;
@@ -1002,10 +1003,18 @@ window.addEventListener("wheel", event => {
 }, { passive: false });
 
 window.addEventListener("touchstart", event => {
+  if (event.target.closest?.("#terrain-stage")) {
+    touchStart = null;
+    return;
+  }
   touchStart = event.changedTouches[0].clientX;
 }, { passive: true });
 
 window.addEventListener("touchend", event => {
+  if (event.target.closest?.("#terrain-stage")) {
+    touchStart = null;
+    return;
+  }
   if (touchStart === null || planning.classList.contains("open")) return;
   const distance = event.changedTouches[0].clientX - touchStart;
   if (Math.abs(distance) > 55) setDay(activeDay + (distance < 0 ? 1 : -1));

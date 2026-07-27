@@ -166,6 +166,9 @@ class TerrainStage {
     if (progress) progress.textContent = `${Math.round(value)}%`;
     if (loader && label) loader.querySelector("span").textContent = label;
     if (loader) loader.style.setProperty("--load", `${value}%`);
+    window.dispatchEvent(new CustomEvent("terrain-progress", {
+      detail: { value, label }
+    }));
   }
 
   fail(error) {
@@ -1442,6 +1445,7 @@ class TerrainStage {
       if (regionChanged) await this.buildArrivalGlobe();
       this.buildArrivalRoute();
       this.focusArrivalGlobe(options.instant);
+      this.setProgress(100, "3D 旅行舞台已就绪");
       document.querySelector("#terrain-loading")?.classList.add("ready");
       return { regionChanged };
     }
@@ -1449,6 +1453,7 @@ class TerrainStage {
     this.buildDayRoute(day);
     this.labelSprites.forEach(label => { label.visible = true; });
     this.focusOverview(options.instant);
+    this.setProgress(100, "3D 旅行舞台已就绪");
     document.querySelector("#terrain-loading")?.classList.add("ready");
     return { regionChanged };
   }

@@ -340,6 +340,51 @@ const terrainFeatures = [
 
 window.tripDays = days;
 
+const globalLoader = {
+  root: document.querySelector("#global-loader"),
+  label: document.querySelector("#global-loader-label"),
+  value: document.querySelector("#global-loader-value")
+};
+let globalLoadValue = 6;
+let globalLoadActive = true;
+let globalLoadTimer = null;
+
+function setGlobalLoading(value, label) {
+  if (!globalLoader.root) return;
+  const next = Math.max(0, Math.min(100, Math.round(value)));
+  if (next < 100 && !globalLoadActive) {
+    globalLoadActive = true;
+    globalLoadValue = next;
+    globalLoader.root.classList.remove("is-done");
+    globalLoader.root.setAttribute("aria-hidden", "false");
+  } else {
+    globalLoadValue = Math.max(globalLoadValue, next);
+  }
+  window.clearTimeout(globalLoadTimer);
+  globalLoader.root.style.setProperty("--progress", `${globalLoadValue}%`);
+  globalLoader.value.textContent = `${globalLoadValue}%`;
+  if (label) globalLoader.label.textContent = label;
+  if (next >= 100) {
+    globalLoadValue = 100;
+    globalLoadTimer = window.setTimeout(() => {
+      globalLoadActive = false;
+      globalLoader.root.classList.add("is-done");
+      globalLoader.root.setAttribute("aria-hidden", "true");
+    }, 520);
+  }
+}
+
+setGlobalLoading(10, "正在读取路线与地图");
+
+window.addEventListener("terrain-progress", event => {
+  const detail = event.detail || {};
+  setGlobalLoading(45 + (Number(detail.value) || 0) * .55, detail.label || "正在搭建 3D 地球");
+});
+
+window.addEventListener("terrain-ready", () => {
+  setGlobalLoading(100, "3D 旅行舞台已就绪");
+});
+
 class CuteGlobe {
   constructor(canvas, itinerary) {
     this.canvas = canvas;
@@ -398,9 +443,11 @@ class CuteGlobe {
       this.mesh = topojson.mesh(world, world.objects.countries, (a, b) => a !== b);
       this.canvas.classList.add("globe-ready");
       this.draw();
+      setGlobalLoading(45, "地图轮廓加载完成");
     } catch (error) {
       this.canvas.classList.add("globe-fallback");
       this.draw();
+      setGlobalLoading(45, "已启用轻量地图模式");
     }
   }
 
@@ -958,6 +1005,7 @@ function setDay(index, immediate = false) {
 }
 
 function enterExperience() {
+  if (!window.terrainStage) setGlobalLoading(48, "正在加载可爱地貌地球");
   window.dispatchEvent(new Event("terrain-start"));
   resetStageViewport();
   document.body.classList.remove("intro-open");

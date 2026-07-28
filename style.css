@@ -122,8 +122,8 @@ button { color: inherit; }
   inset: 0;
   z-index: -1;
   background:
-    linear-gradient(90deg, #071f1d 0%, rgba(7,31,29,.97) 36%, rgba(7,31,29,.68) 57%, rgba(7,31,29,.12) 84%),
-    linear-gradient(0deg, rgba(4,24,21,.68), transparent 55%);
+    linear-gradient(90deg, rgba(1,8,13,.96) 0%, rgba(1,8,13,.78) 38%, rgba(1,8,13,.32) 62%, transparent 88%),
+    linear-gradient(0deg, rgba(1,6,10,.72), transparent 55%);
 }
 
 .intro-bg {
@@ -254,8 +254,13 @@ body.intro-open .transport-card {
   position: fixed;
   inset: 0;
   background:
-    radial-gradient(circle at 74% 28%, rgba(59,126,109,.26), transparent 31%),
-    linear-gradient(145deg, #061c1a, #0a2a26 58%, #071f1d);
+    radial-gradient(circle at 74% 44%, rgba(0,158,190,.2), transparent 38%),
+    radial-gradient(circle at 18% 36%, rgba(18,101,91,.12), transparent 34%),
+    radial-gradient(circle at 8% 20%, rgba(170,235,255,.62) 0 1px, transparent 1.4px),
+    radial-gradient(circle at 62% 14%, rgba(255,255,255,.52) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 42% 76%, rgba(85,196,255,.48) 0 1px, transparent 1.4px),
+    #01050a;
+  background-size: 100% 100%, 100% 100%, 149px 157px, 203px 191px, 263px 247px, 100% 100%;
 }
 
 .topbar {
@@ -326,15 +331,14 @@ body.intro-open .transport-card {
   content: "";
   position: absolute;
   z-index: 0;
-  inset: 0 0 0 38%;
+  inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(circle at 66% 48%, rgba(0,160,190,.18), transparent 42%),
-    radial-gradient(circle at 12% 20%, rgba(170,235,255,.68) 0 1px, transparent 1.4px),
-    radial-gradient(circle at 72% 14%, rgba(255,255,255,.52) 0 1px, transparent 1.5px),
-    radial-gradient(circle at 44% 76%, rgba(85,196,255,.52) 0 1px, transparent 1.4px),
-    #01050a;
-  background-size: 100% 100%, 143px 151px, 197px 181px, 251px 239px, 100% 100%;
+    radial-gradient(circle at 70% 48%, rgba(0,160,190,.12), transparent 44%),
+    radial-gradient(circle at 14% 24%, rgba(170,235,255,.42) 0 1px, transparent 1.4px),
+    radial-gradient(circle at 78% 16%, rgba(255,255,255,.38) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 46% 80%, rgba(85,196,255,.38) 0 1px, transparent 1.4px);
+  background-size: 100% 100%, 143px 151px, 197px 181px, 251px 239px;
 }
 
 .terrain-stage {

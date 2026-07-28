@@ -76,6 +76,14 @@ const GLOBE_RADIUS = 20;
 const GLOBE_CENTER_Y = -20.45;
 const TERRAIN_RELIEF = .68;
 
+const seededRandom = seed => {
+  let state = Math.max(1, seed % 2147483647);
+  return () => {
+    state = state * 16807 % 2147483647;
+    return (state - 1) / 2147483646;
+  };
+};
+
 class TerrainStage {
   constructor(canvas, itinerary) {
     this.canvas = canvas;
@@ -200,11 +208,11 @@ class TerrainStage {
     this.scene.add(stars);
   }
 
-  createAtmosphere(radius, centerY = 0, color = 0x25dfff) {
+  createAtmosphere(radius, centerY = 0, color = 0x25dfff, strength = .92) {
     const material = new THREE.ShaderMaterial({
       uniforms: {
         glowColor: { value: new THREE.Color(color) },
-        glowStrength: { value: .92 }
+        glowStrength: { value: strength }
       },
       vertexShader: `
         varying vec3 vNormal;
@@ -615,29 +623,67 @@ class TerrainStage {
         }
       }
     }
-    const geometry = new THREE.ConeGeometry(.1, .38, 6);
-    const material = new THREE.MeshStandardMaterial({
-      color: 0x3d972d,
-      emissive: 0x0c300c,
-      emissiveIntensity: .16,
-      roughness: .9,
+    const group = new THREE.Group();
+    const trunks = new THREE.InstancedMesh(
+      new THREE.CylinderGeometry(.035, .05, .25, 5),
+      new THREE.MeshStandardMaterial({ color: 0x60482e, roughness: .96 }),
+      coordinates.length
+    );
+    const crownMaterial = new THREE.MeshStandardMaterial({
+      color: 0xffffff,
+      emissive: 0x0b2c10,
+      emissiveIntensity: .13,
+      roughness: .88,
       flatShading: true
     });
-    const forest = new THREE.InstancedMesh(geometry, material, coordinates.length);
+    const lowerCrowns = new THREE.InstancedMesh(
+      new THREE.IcosahedronGeometry(.13, 1),
+      crownMaterial,
+      coordinates.length
+    );
+    const upperCrowns = new THREE.InstancedMesh(
+      new THREE.IcosahedronGeometry(.1, 1),
+      crownMaterial.clone(),
+      coordinates.length
+    );
     const matrix = new THREE.Matrix4();
     const quaternion = new THREE.Quaternion();
     const unitY = new THREE.Vector3(0, 1, 0);
+    const palette = [0x2f8d36, 0x4ca33a, 0x69b443, 0x388f43];
     coordinates.forEach(([longitude, latitude, treeScale], index) => {
       const base = this.arrivalPoint([longitude, latitude], 14.14);
       const normal = base.clone().normalize();
-      const position = base.clone().add(normal.clone().multiplyScalar(.18 * treeScale));
       quaternion.setFromUnitVectors(unitY, normal);
-      matrix.compose(position, quaternion, new THREE.Vector3(treeScale, treeScale, treeScale));
-      forest.setMatrixAt(index, matrix);
+      matrix.compose(
+        base.clone().add(normal.clone().multiplyScalar(.11 * treeScale)),
+        quaternion,
+        new THREE.Vector3(treeScale, treeScale, treeScale)
+      );
+      trunks.setMatrixAt(index, matrix);
+      matrix.compose(
+        base.clone().add(normal.clone().multiplyScalar(.28 * treeScale)),
+        quaternion,
+        new THREE.Vector3(treeScale * 1.08, treeScale * .86, treeScale)
+      );
+      lowerCrowns.setMatrixAt(index, matrix);
+      matrix.compose(
+        base.clone().add(normal.clone().multiplyScalar(.39 * treeScale)),
+        quaternion,
+        new THREE.Vector3(treeScale * .82, treeScale * .78, treeScale * .86)
+      );
+      upperCrowns.setMatrixAt(index, matrix);
+      const color = new THREE.Color(palette[index % palette.length]);
+      lowerCrowns.setColorAt(index, color);
+      upperCrowns.setColorAt(index, color.clone().offsetHSL(.015, -.03, .045));
     });
-    forest.instanceMatrix.needsUpdate = true;
-    forest.castShadow = true;
-    return forest;
+    [trunks, lowerCrowns, upperCrowns].forEach(mesh => {
+      mesh.instanceMatrix.needsUpdate = true;
+      mesh.castShadow = true;
+    });
+    if (lowerCrowns.instanceColor) lowerCrowns.instanceColor.needsUpdate = true;
+    if (upperCrowns.instanceColor) upperCrowns.instanceColor.needsUpdate = true;
+    group.add(trunks, lowerCrowns, upperCrowns);
+    return group;
   }
 
   buildArrivalRoute() {
@@ -861,7 +907,10 @@ class TerrainStage {
     grid.position.y = GLOBE_CENTER_Y;
     globe.add(grid);
 
-    globe.add(this.createAtmosphere(GLOBE_RADIUS + .76, GLOBE_CENTER_Y, 0x21ddff));
+    globe.add(
+      this.createAtmosphere(GLOBE_RADIUS + .76, GLOBE_CENTER_Y, 0x21ddff),
+      this.createAtmosphere(GLOBE_RADIUS + .34, GLOBE_CENTER_Y, 0x3ef3e2, .28)
+    );
     return globe;
   }
 
@@ -885,43 +934,55 @@ class TerrainStage {
   createForest(config) {
     const entries = [];
     config.forests.forEach((coordinate, forestIndex) => {
-      for (let index = 0; index < 18; index += 1) {
+      for (let index = 0; index < 48; index += 1) {
         const angle = index * 2.399 + forestIndex * .83;
-        const radius = .24 + (index % 6) * .16;
-        const scale = .52 + ((index * 7 + forestIndex * 3) % 8) * .045;
-        entries.push({
-          coord: [
-            coordinate[0] + Math.cos(angle) * radius / this.regionScale(config),
-            coordinate[1] + Math.sin(angle) * radius / this.regionScale(config)
-          ],
-          scale
-        });
+        const radius = .12 + Math.sqrt((index + .5) / 48) * 1.08;
+        const scale = .48 + ((index * 7 + forestIndex * 3) % 11) * .037;
+        const coord = [
+          coordinate[0] + Math.cos(angle) * radius / this.regionScale(config),
+          coordinate[1] + Math.sin(angle) * radius / this.regionScale(config)
+        ];
+        if (this.isLand(coord, config)) entries.push({ coord, scale, angle });
       }
     });
 
     const group = new THREE.Group();
-    const trunkGeometry = new THREE.CylinderGeometry(.05, .075, .48, 6);
-    const crownGeometry = new THREE.ConeGeometry(.27, .78, 7);
+    const trunkGeometry = new THREE.CylinderGeometry(.045, .075, .46, 6);
+    const crownGeometry = new THREE.IcosahedronGeometry(.28, 1);
+    const upperCrownGeometry = new THREE.IcosahedronGeometry(.23, 1);
+    const sideCrownGeometry = new THREE.IcosahedronGeometry(.18, 1);
     const trunks = new THREE.InstancedMesh(
       trunkGeometry,
       new THREE.MeshStandardMaterial({ color: 0x6f4d2e, roughness: .95 }),
       entries.length
     );
-    const crowns = new THREE.InstancedMesh(
+    const crownMaterial = new THREE.MeshStandardMaterial({
+      color: 0xffffff,
+      emissive: 0x092e0d,
+      emissiveIntensity: .14,
+      roughness: .86,
+      flatShading: true
+    });
+    const lowerCrowns = new THREE.InstancedMesh(
       crownGeometry,
-      new THREE.MeshStandardMaterial({
-        color: 0x2f8e2e,
-        emissive: 0x0b2d0c,
-        emissiveIntensity: .15,
-        roughness: .88,
-        flatShading: true
-      }),
+      crownMaterial,
+      entries.length
+    );
+    const upperCrowns = new THREE.InstancedMesh(
+      upperCrownGeometry,
+      crownMaterial.clone(),
+      entries.length
+    );
+    const sideCrowns = new THREE.InstancedMesh(
+      sideCrownGeometry,
+      crownMaterial.clone(),
       entries.length
     );
     const matrix = new THREE.Matrix4();
     const quaternion = new THREE.Quaternion();
     const unitY = new THREE.Vector3(0, 1, 0);
-    entries.forEach(({ coord, scale }, index) => {
+    const treePalette = [0x277e31, 0x34923a, 0x4ca33b, 0x5bad3f, 0x3f9348];
+    entries.forEach(({ coord, scale, angle }, index) => {
       const base = this.terrainPoint(coord, .02, config);
       const normal = this.surfaceNormal(base);
       quaternion.setFromUnitVectors(unitY, normal);
@@ -932,17 +993,285 @@ class TerrainStage {
       );
       trunks.setMatrixAt(index, matrix);
       matrix.compose(
-        base.clone().add(normal.clone().multiplyScalar(.82 * scale)),
+        base.clone().add(normal.clone().multiplyScalar(.7 * scale)),
         quaternion,
-        new THREE.Vector3(scale, scale, scale)
+        new THREE.Vector3(scale * 1.06, scale * .88, scale)
       );
-      crowns.setMatrixAt(index, matrix);
+      lowerCrowns.setMatrixAt(index, matrix);
+      matrix.compose(
+        base.clone().add(normal.clone().multiplyScalar(.97 * scale)),
+        quaternion,
+        new THREE.Vector3(scale * .78, scale * .72, scale * .82)
+      );
+      upperCrowns.setMatrixAt(index, matrix);
+      const localOffset = new THREE.Vector3(
+        Math.cos(angle) * .18 * scale,
+        .73 * scale,
+        Math.sin(angle) * .18 * scale
+      ).applyQuaternion(quaternion);
+      matrix.compose(
+        base.clone().add(localOffset),
+        quaternion,
+        new THREE.Vector3(scale * .68, scale * .62, scale * .72)
+      );
+      sideCrowns.setMatrixAt(index, matrix);
+      const color = new THREE.Color(treePalette[(index + Math.floor(angle * 3)) % treePalette.length]);
+      lowerCrowns.setColorAt(index, color);
+      upperCrowns.setColorAt(index, color.clone().offsetHSL(.012, -.02, .045));
+      sideCrowns.setColorAt(index, color.clone().offsetHSL(-.012, .02, -.025));
     });
-    trunks.instanceMatrix.needsUpdate = true;
-    crowns.instanceMatrix.needsUpdate = true;
-    trunks.castShadow = true;
-    crowns.castShadow = true;
-    group.add(trunks, crowns);
+    [trunks, lowerCrowns, upperCrowns, sideCrowns].forEach(mesh => {
+      mesh.instanceMatrix.needsUpdate = true;
+      mesh.castShadow = true;
+    });
+    [lowerCrowns, upperCrowns, sideCrowns].forEach(mesh => {
+      if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+    });
+    group.add(trunks, lowerCrowns, upperCrowns, sideCrowns);
+    return group;
+  }
+
+  createSurfaceDetails(config) {
+    const [minLon, maxLon, minLat, maxLat] = config.bounds;
+    const regionSeed = Math.round((minLon + maxLon) * 1000 + (minLat + maxLat) * 10000);
+    const random = seededRandom(Math.abs(regionSeed));
+    const entries = [];
+    const targetCount = 620;
+    for (let attempt = 0; attempt < 5200 && entries.length < targetCount; attempt += 1) {
+      const coord = [
+        THREE.MathUtils.lerp(minLon, maxLon, .025 + random() * .95),
+        THREE.MathUtils.lerp(minLat, maxLat, .025 + random() * .95)
+      ];
+      if (!this.isLand(coord, config)) continue;
+      const height = this.heightAt(coord, config);
+      if (height > 2.5 || random() < Math.max(0, height - .7) * .24) continue;
+      entries.push({
+        coord,
+        height,
+        scale: .55 + random() * .9,
+        rotation: random() * Math.PI * 2,
+        kind: random()
+      });
+    }
+
+    const groundEntries = entries.slice(0, 170);
+    const grassEntries = entries.slice(80, 500);
+    const shrubEntries = entries.filter(entry => entry.kind > .77).slice(0, 88);
+    const flowerEntries = entries.filter(entry => entry.kind > .42 && entry.kind < .7).slice(0, 145);
+    const flowerHeadsEntries = flowerEntries.flatMap(entry => (
+      [0, 1, 2].map(petal => ({ ...entry, petal }))
+    ));
+    const rockEntries = entries.filter(entry => entry.kind < .085).slice(0, 34);
+    const group = new THREE.Group();
+    const matrix = new THREE.Matrix4();
+    const quaternion = new THREE.Quaternion();
+    const unitY = new THREE.Vector3(0, 1, 0);
+
+    const placeInstances = (mesh, instanceEntries, buildTransform, palette) => {
+      instanceEntries.forEach((entry, index) => {
+        const base = this.terrainPoint(entry.coord, .025, config);
+        const normal = this.surfaceNormal(base);
+        quaternion.setFromUnitVectors(unitY, normal);
+        buildTransform(entry, base, normal, quaternion, matrix);
+        mesh.setMatrixAt(index, matrix);
+        if (palette) {
+          const color = new THREE.Color(palette[Math.floor(entry.kind * palette.length) % palette.length]);
+          mesh.setColorAt(index, color);
+        }
+      });
+      mesh.instanceMatrix.needsUpdate = true;
+      if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+      group.add(mesh);
+    };
+
+    const groundGeometry = new THREE.CircleGeometry(.2, 7);
+    groundGeometry.rotateX(-Math.PI / 2);
+    const groundFlecks = new THREE.InstancedMesh(
+      groundGeometry,
+      new THREE.MeshStandardMaterial({
+        color: 0xffffff,
+        roughness: .95,
+        transparent: true,
+        opacity: .44,
+        depthWrite: false,
+        polygonOffset: true,
+        polygonOffsetFactor: -1
+      }),
+      groundEntries.length
+    );
+    placeInstances(groundFlecks, groundEntries, (entry, base, normal, orientation, transform) => {
+      const rotation = orientation.clone().multiply(
+        new THREE.Quaternion().setFromAxisAngle(unitY, entry.rotation)
+      );
+      transform.compose(
+        base.clone().add(normal.clone().multiplyScalar(.015)),
+        rotation,
+        new THREE.Vector3(entry.scale * (1.3 + entry.kind), 1, entry.scale * (.55 + entry.kind * .4))
+      );
+    }, [0x86ca35, 0xa1d845, 0x69b537, 0xb4d74e, 0x5ca13a]);
+
+    const grassTufts = new THREE.InstancedMesh(
+      new THREE.ConeGeometry(.035, .18, 3),
+      new THREE.MeshStandardMaterial({
+        color: 0xffffff,
+        emissive: 0x15350d,
+        emissiveIntensity: .08,
+        roughness: .94,
+        flatShading: true
+      }),
+      grassEntries.length
+    );
+    placeInstances(grassTufts, grassEntries, (entry, base, normal, orientation, transform) => {
+      const rotation = orientation.clone().multiply(
+        new THREE.Quaternion().setFromAxisAngle(unitY, entry.rotation)
+      );
+      transform.compose(
+        base.clone().add(normal.clone().multiplyScalar(.075 * entry.scale)),
+        rotation,
+        new THREE.Vector3(entry.scale * (1 + entry.kind), entry.scale, entry.scale * .7)
+      );
+    }, [0x4c992e, 0x61ad31, 0x7abe37, 0x8dca3e, 0x3f8830]);
+    grassTufts.castShadow = true;
+
+    const shrubs = new THREE.InstancedMesh(
+      new THREE.IcosahedronGeometry(.18, 1),
+      new THREE.MeshStandardMaterial({
+        color: 0xffffff,
+        emissive: 0x0b2b0c,
+        emissiveIntensity: .12,
+        roughness: .9,
+        flatShading: true
+      }),
+      shrubEntries.length
+    );
+    placeInstances(shrubs, shrubEntries, (entry, base, normal, orientation, transform) => {
+      transform.compose(
+        base.clone().add(normal.clone().multiplyScalar(.13 * entry.scale)),
+        orientation,
+        new THREE.Vector3(entry.scale * (1.1 + entry.kind * .35), entry.scale * .72, entry.scale)
+      );
+    }, [0x2f8131, 0x46943a, 0x57a642, 0x397a39]);
+    shrubs.castShadow = true;
+
+    const flowerHeads = new THREE.InstancedMesh(
+      new THREE.IcosahedronGeometry(.045, 0),
+      new THREE.MeshStandardMaterial({
+        color: 0xffffff,
+        emissive: 0x9d5f00,
+        emissiveIntensity: .22,
+        roughness: .72,
+        flatShading: true
+      }),
+      flowerHeadsEntries.length
+    );
+    placeInstances(flowerHeads, flowerHeadsEntries, (entry, base, normal, orientation, transform) => {
+      const flowerAngle = entry.rotation + entry.petal * 2.094;
+      const tangentOffset = new THREE.Vector3(
+        Math.cos(flowerAngle) * (.035 + entry.petal * .012),
+        .13 + entry.kind * .08 + entry.petal * .014,
+        Math.sin(flowerAngle) * (.035 + entry.petal * .012)
+      ).applyQuaternion(orientation);
+      transform.compose(
+        base.clone().add(tangentOffset),
+        orientation,
+        new THREE.Vector3(entry.scale * (1.2 + entry.kind), entry.scale, entry.scale * 1.2)
+      );
+    }, [0xffc928, 0xffdc3e, 0xf6ad1c, 0xffe66a]);
+
+    const rocks = new THREE.InstancedMesh(
+      new THREE.DodecahedronGeometry(.15, 0),
+      new THREE.MeshStandardMaterial({
+        color: 0xffffff,
+        roughness: .98,
+        metalness: .02,
+        flatShading: true
+      }),
+      rockEntries.length
+    );
+    placeInstances(rocks, rockEntries, (entry, base, normal, orientation, transform) => {
+      const rotation = orientation.clone().multiply(
+        new THREE.Quaternion().setFromAxisAngle(unitY, entry.rotation)
+      );
+      transform.compose(
+        base.clone().add(normal.clone().multiplyScalar(.08 * entry.scale)),
+        rotation,
+        new THREE.Vector3(entry.scale * (1.2 + entry.kind * 2), entry.scale * .62, entry.scale)
+      );
+    }, [0x667168, 0x7a826d, 0x525f58, 0x8b886f]);
+    rocks.castShadow = true;
+    rocks.receiveShadow = true;
+    return group;
+  }
+
+  createWetlands(config) {
+    const [minLon, maxLon, minLat, maxLat] = config.bounds;
+    const random = seededRandom(Math.abs(Math.round(minLon * 8701 + minLat * 1297)));
+    const channelCandidates = [];
+    const geoLength = Math.min(maxLon - minLon, maxLat - minLat) * .34;
+    for (let attempt = 0; attempt < 110; attempt += 1) {
+      const center = [
+        THREE.MathUtils.lerp(minLon, maxLon, .08 + random() * .84),
+        THREE.MathUtils.lerp(minLat, maxLat, .08 + random() * .84)
+      ];
+      if (!this.isLand(center, config) || this.heightAt(center, config) > 1.05) continue;
+      const angle = (random() - .5) * 1.05;
+      const bend = .055 + random() * .055;
+      let run = [];
+      let longestRun = [];
+      for (let index = 0; index < 29; index += 1) {
+        const t = index / 28 - .5;
+        const meander = Math.sin(t * Math.PI * 3 + attempt) * bend;
+        const coord = [
+          center[0] + Math.cos(angle) * geoLength * t - Math.sin(angle) * meander,
+          center[1] + Math.sin(angle) * geoLength * t + Math.cos(angle) * meander
+        ];
+        if (this.isLand(coord, config) && this.heightAt(coord, config) < 1.25) {
+          run.push(coord);
+          if (run.length > longestRun.length) longestRun = run.slice();
+        } else {
+          run = [];
+        }
+      }
+      if (longestRun.length >= 13) {
+        channelCandidates.push(longestRun);
+        if (channelCandidates.length >= 2) break;
+      }
+    }
+
+    const group = new THREE.Group();
+    const waterMaterial = new THREE.MeshPhysicalMaterial({
+      color: 0x62dbe1,
+      emissive: 0x0b8b9a,
+      emissiveIntensity: .25,
+      roughness: .18,
+      metalness: .02,
+      transparent: true,
+      opacity: .72,
+      clearcoat: .9,
+      clearcoatRoughness: .16,
+      depthWrite: false
+    });
+    const glintMaterial = new THREE.MeshBasicMaterial({
+      color: 0xc8ffff,
+      transparent: true,
+      opacity: .48,
+      depthWrite: false
+    });
+    channelCandidates.forEach((coordinates, index) => {
+      const points = coordinates.map(coord => this.terrainPoint(coord, .065 + index * .006, config));
+      const curve = new THREE.CatmullRomCurve3(points);
+      const channel = new THREE.Mesh(
+        new THREE.TubeGeometry(curve, points.length * 3, .105 + index * .018, 7, false),
+        waterMaterial
+      );
+      channel.renderOrder = 5;
+      const glint = new THREE.Mesh(
+        new THREE.TubeGeometry(curve, points.length * 3, .022, 5, false),
+        glintMaterial
+      );
+      glint.renderOrder = 6;
+      group.add(channel, glint);
+    });
     return group;
   }
 
@@ -1008,7 +1337,11 @@ class TerrainStage {
     });
     config.beaches.forEach(beach => this.worldGroup.add(this.createBeach(beach, config)));
 
-    this.worldGroup.add(this.createForest(config));
+    this.worldGroup.add(
+      this.createSurfaceDetails(config),
+      this.createForest(config),
+      this.createWetlands(config)
+    );
 
     const [minLon, maxLon, minLat, maxLat] = config.bounds;
     [

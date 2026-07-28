@@ -105,6 +105,8 @@ class TerrainStage {
     this.needsRender = true;
     this.inViewport = true;
     this.pageVisible = !document.hidden;
+    this.regionCache = new Map();
+    this.dayRouteCache = new Map();
 
     this.renderer = new THREE.WebGLRenderer({
       canvas,
@@ -112,9 +114,10 @@ class TerrainStage {
       alpha: true,
       powerPreference: "high-performance"
     });
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, window.innerWidth < 900 ? 1.1 : 1.25));
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFShadowMap;
+    this.renderer.shadowMap.autoUpdate = false;
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.16;
@@ -253,7 +256,7 @@ class TerrainStage {
     const progress = document.querySelector("#terrain-progress");
     const loader = document.querySelector("#terrain-loading");
     if (progress) progress.textContent = `${Math.round(value)}%`;
-    if (loader && label) loader.querySelector("span").textContent = label;
+    if (loader) loader.querySelector("span").textContent = value >= 100 ? "加载完成" : "加载中，请稍等";
     if (loader) loader.style.setProperty("--load", `${value}%`);
     window.dispatchEvent(new CustomEvent("terrain-progress", {
       detail: { value, label }
@@ -407,6 +410,27 @@ class TerrainStage {
     }
   }
 
+  clearGroup(group) {
+    while (group.children.length) group.remove(group.children[0]);
+  }
+
+  activateCachedRegion(regionKey) {
+    const cached = this.regionCache.get(regionKey);
+    if (!cached) return false;
+    this.clearGroup(this.worldGroup);
+    this.worldGroup.add(cached);
+    this.renderer.shadowMap.needsUpdate = true;
+    return true;
+  }
+
+  cacheCurrentRegion(regionKey) {
+    const cached = new THREE.Group();
+    while (this.worldGroup.children.length) cached.add(this.worldGroup.children[0]);
+    this.regionCache.set(regionKey, cached);
+    this.worldGroup.add(cached);
+    this.renderer.shadowMap.needsUpdate = true;
+  }
+
   arrivalPoint(coordinate, radius = 14) {
     const longitude = THREE.MathUtils.degToRad(coordinate[0] - 105);
     const latitude = THREE.MathUtils.degToRad(coordinate[1]);
@@ -522,10 +546,13 @@ class TerrainStage {
   async buildArrivalGlobe() {
     this.currentRegion = "arrival";
     document.querySelector("#terrain-loading")?.classList.remove("ready");
+    if (this.activateCachedRegion("arrival")) {
+      this.setProgress(76, "正在恢复亚太微缩行星");
+      return;
+    }
     this.setProgress(36, "正在生成亚太微缩行星");
     await new Promise(resolve => requestAnimationFrame(resolve));
-    this.disposeGroup(this.worldGroup);
-    this.disposeGroup(this.routeGroup);
+    this.clearGroup(this.worldGroup);
 
     const ocean = new THREE.Mesh(
       new THREE.SphereGeometry(14, 96, 64),
@@ -610,6 +637,7 @@ class TerrainStage {
     });
 
     this.worldGroup.add(this.createAtmosphere(14.72, 0, 0x22dcff));
+    this.cacheCurrentRegion("arrival");
     this.setProgress(76, "正在绘制上海至泗水航线");
   }
 
@@ -678,7 +706,7 @@ class TerrainStage {
     });
     [trunks, lowerCrowns, upperCrowns].forEach(mesh => {
       mesh.instanceMatrix.needsUpdate = true;
-      mesh.castShadow = true;
+      mesh.castShadow = mesh === lowerCrowns;
     });
     if (lowerCrowns.instanceColor) lowerCrowns.instanceColor.needsUpdate = true;
     if (upperCrowns.instanceColor) upperCrowns.instanceColor.needsUpdate = true;
@@ -687,7 +715,13 @@ class TerrainStage {
   }
 
   buildArrivalRoute() {
-    this.disposeGroup(this.routeGroup);
+    this.clearGroup(this.routeGroup);
+    const cached = this.dayRouteCache.get("arrival");
+    if (cached) {
+      this.routeGroup.add(cached);
+      return;
+    }
+    const routeScene = new THREE.Group();
     const start = this.arrivalPoint([121.81, 31.15], 1).normalize();
     const end = this.arrivalPoint([112.79, -7.38], 1).normalize();
     const axis = start.clone().cross(end).normalize();
@@ -708,8 +742,8 @@ class TerrainStage {
         roughness: .45
       })
     );
-    this.routeGroup.add(route);
-    this.routeGroup.add(
+    routeScene.add(route);
+    routeScene.add(
       this.createArrivalMarker([121.81, 31.15], 1, 0xff7867),
       this.createArrivalMarker([112.79, -7.38], 2, 0xff7867)
     );
@@ -719,7 +753,10 @@ class TerrainStage {
     plane.position.copy(planePoint);
     plane.scale.multiplyScalar(.92);
     this.orientArrivalVehicle(plane, tangent, planePoint);
-    this.routeGroup.add(plane);
+    routeScene.add(plane);
+    this.dayRouteCache.set("arrival", routeScene);
+    this.routeGroup.add(routeScene);
+    this.renderer.shadowMap.needsUpdate = true;
   }
 
   focusArrivalGlobe(instant = false, resetInteraction = true) {
@@ -737,7 +774,7 @@ class TerrainStage {
       this.applyUserView();
       return;
     }
-    this.setCameraTween(position, target, instant ? 1 : 1450);
+    this.setCameraTween(position, target, instant ? 1 : 900);
   }
 
   regionScale(config) {
@@ -837,7 +874,7 @@ class TerrainStage {
 
   buildTerrainGeometry(config) {
     const [minLon, maxLon, minLat, maxLat] = config.bounds;
-    const nx = 112;
+    const nx = 96;
     const ny = Math.max(68, Math.round(nx * (maxLat - minLat) / (maxLon - minLon)));
     const positions = [];
     const colors = [];
@@ -853,6 +890,9 @@ class TerrainStage {
         const point = this.surfacePoint(coordinate, height * TERRAIN_RELIEF, config);
         positions.push(point.x, point.y, point.z);
         const color = this.colorForHeight(height);
+        const grassGrain = Math.sin(coordinate[0] * 91.7 + coordinate[1] * 137.3) * .5
+          + Math.sin(coordinate[0] * 211.1 - coordinate[1] * 73.9) * .25;
+        color.offsetHSL(grassGrain * .006, grassGrain * .018, grassGrain * .035);
         colors.push(color.r, color.g, color.b);
       });
     };
@@ -934,15 +974,17 @@ class TerrainStage {
   createForest(config) {
     const entries = [];
     config.forests.forEach((coordinate, forestIndex) => {
-      for (let index = 0; index < 48; index += 1) {
+      for (let index = 0; index < 16; index += 1) {
         const angle = index * 2.399 + forestIndex * .83;
-        const radius = .12 + Math.sqrt((index + .5) / 48) * 1.08;
-        const scale = .48 + ((index * 7 + forestIndex * 3) % 11) * .037;
+        const radius = .16 + Math.sqrt((index + .5) / 16) * .82;
+        const scale = .42 + ((index * 7 + forestIndex * 3) % 9) * .032;
         const coord = [
           coordinate[0] + Math.cos(angle) * radius / this.regionScale(config),
           coordinate[1] + Math.sin(angle) * radius / this.regionScale(config)
         ];
-        if (this.isLand(coord, config)) entries.push({ coord, scale, angle });
+        if (this.isLand(coord, config) && this.heightAt(coord, config) < 1.45) {
+          entries.push({ coord, scale, angle });
+        }
       }
     });
 
@@ -1022,7 +1064,7 @@ class TerrainStage {
     });
     [trunks, lowerCrowns, upperCrowns, sideCrowns].forEach(mesh => {
       mesh.instanceMatrix.needsUpdate = true;
-      mesh.castShadow = true;
+      mesh.castShadow = mesh === lowerCrowns;
     });
     [lowerCrowns, upperCrowns, sideCrowns].forEach(mesh => {
       if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
@@ -1031,20 +1073,43 @@ class TerrainStage {
     return group;
   }
 
+  createGrassTuftGeometry() {
+    const positions = [];
+    const bladeCount = 5;
+    for (let index = 0; index < bladeCount; index += 1) {
+      const angle = index * Math.PI / bladeCount;
+      const direction = new THREE.Vector3(Math.cos(angle), 0, Math.sin(angle));
+      const side = new THREE.Vector3(-direction.z, 0, direction.x).multiplyScalar(.026);
+      const base = direction.clone().multiplyScalar((index % 2) * .018);
+      const tip = base.clone()
+        .add(direction.clone().multiplyScalar(.035 + index * .006))
+        .add(new THREE.Vector3(0, .2 + (index % 3) * .035, 0));
+      positions.push(
+        base.x - side.x, 0, base.z - side.z,
+        base.x + side.x, 0, base.z + side.z,
+        tip.x, tip.y, tip.z
+      );
+    }
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+    geometry.computeVertexNormals();
+    return geometry;
+  }
+
   createSurfaceDetails(config) {
     const [minLon, maxLon, minLat, maxLat] = config.bounds;
     const regionSeed = Math.round((minLon + maxLon) * 1000 + (minLat + maxLat) * 10000);
     const random = seededRandom(Math.abs(regionSeed));
     const entries = [];
-    const targetCount = 620;
-    for (let attempt = 0; attempt < 5200 && entries.length < targetCount; attempt += 1) {
+    const targetCount = 700;
+    for (let attempt = 0; attempt < 4600 && entries.length < targetCount; attempt += 1) {
       const coord = [
         THREE.MathUtils.lerp(minLon, maxLon, .025 + random() * .95),
         THREE.MathUtils.lerp(minLat, maxLat, .025 + random() * .95)
       ];
       if (!this.isLand(coord, config)) continue;
       const height = this.heightAt(coord, config);
-      if (height > 2.5 || random() < Math.max(0, height - .7) * .24) continue;
+      if (height > 1.55 || (height > .85 && random() < .68)) continue;
       entries.push({
         coord,
         height,
@@ -1054,10 +1119,10 @@ class TerrainStage {
       });
     }
 
-    const groundEntries = entries.slice(0, 170);
-    const grassEntries = entries.slice(80, 500);
-    const shrubEntries = entries.filter(entry => entry.kind > .77).slice(0, 88);
-    const flowerEntries = entries.filter(entry => entry.kind > .42 && entry.kind < .7).slice(0, 145);
+    const groundEntries = entries.slice(0, 260);
+    const grassEntries = entries.slice(60, 500);
+    const shrubEntries = entries.filter(entry => entry.kind > .82).slice(0, 48);
+    const flowerEntries = entries.filter(entry => entry.kind > .5 && entry.kind < .66).slice(0, 78);
     const flowerHeadsEntries = flowerEntries.flatMap(entry => (
       [0, 1, 2].map(petal => ({ ...entry, petal }))
     ));
@@ -1092,7 +1157,7 @@ class TerrainStage {
         color: 0xffffff,
         roughness: .95,
         transparent: true,
-        opacity: .44,
+        opacity: .28,
         depthWrite: false,
         polygonOffset: true,
         polygonOffsetFactor: -1
@@ -1111,13 +1176,14 @@ class TerrainStage {
     }, [0x86ca35, 0xa1d845, 0x69b537, 0xb4d74e, 0x5ca13a]);
 
     const grassTufts = new THREE.InstancedMesh(
-      new THREE.ConeGeometry(.035, .18, 3),
+      this.createGrassTuftGeometry(),
       new THREE.MeshStandardMaterial({
         color: 0xffffff,
         emissive: 0x15350d,
         emissiveIntensity: .08,
         roughness: .94,
-        flatShading: true
+        flatShading: true,
+        side: THREE.DoubleSide
       }),
       grassEntries.length
     );
@@ -1128,10 +1194,9 @@ class TerrainStage {
       transform.compose(
         base.clone().add(normal.clone().multiplyScalar(.075 * entry.scale)),
         rotation,
-        new THREE.Vector3(entry.scale * (1 + entry.kind), entry.scale, entry.scale * .7)
+        new THREE.Vector3(entry.scale * (.75 + entry.kind * .5), entry.scale, entry.scale * (.75 + entry.kind * .35))
       );
     }, [0x4c992e, 0x61ad31, 0x7abe37, 0x8dca3e, 0x3f8830]);
-    grassTufts.castShadow = true;
 
     const shrubs = new THREE.InstancedMesh(
       new THREE.IcosahedronGeometry(.18, 1),
@@ -1148,10 +1213,9 @@ class TerrainStage {
       transform.compose(
         base.clone().add(normal.clone().multiplyScalar(.13 * entry.scale)),
         orientation,
-        new THREE.Vector3(entry.scale * (1.1 + entry.kind * .35), entry.scale * .72, entry.scale)
+        new THREE.Vector3(entry.scale * (.72 + entry.kind * .25), entry.scale * .48, entry.scale * .68)
       );
     }, [0x2f8131, 0x46943a, 0x57a642, 0x397a39]);
-    shrubs.castShadow = true;
 
     const flowerHeads = new THREE.InstancedMesh(
       new THREE.IcosahedronGeometry(.045, 0),
@@ -1309,10 +1373,15 @@ class TerrainStage {
     this.currentRegion = regionKey;
     document.querySelector("#terrain-stage")?.classList.add("building");
     document.querySelector("#terrain-loading")?.classList.remove("ready");
+    if (this.activateCachedRegion(regionKey)) {
+      this.setProgress(82, `正在恢复${config.name}行星地貌`);
+      document.querySelector("#terrain-stage")?.classList.remove("building");
+      return;
+    }
     this.setProgress(38, `正在生成${config.name}行星地貌`);
     await new Promise(resolve => requestAnimationFrame(resolve));
 
-    this.disposeGroup(this.worldGroup);
+    this.clearGroup(this.worldGroup);
     this.worldGroup.add(this.createGlobe(config));
 
     this.setProgress(58, `正在抬升${config.name}山脉与植被`);
@@ -1356,6 +1425,7 @@ class TerrainStage {
     });
 
     this.worldGroup.rotation.y = 0;
+    this.cacheCurrentRegion(regionKey);
     this.setProgress(82, "正在放置景点与交通路线");
     document.querySelector("#terrain-stage")?.classList.remove("building");
   }
@@ -1574,18 +1644,25 @@ class TerrainStage {
   }
 
   buildDayRoute(day) {
-    this.disposeGroup(this.routeGroup);
+    this.clearGroup(this.routeGroup);
     this.labelSprites = [];
     this.photoSprites = [];
+    const cacheKey = `day-${this.dayIndex}`;
+    const cached = this.dayRouteCache.get(cacheKey);
+    if (cached) {
+      this.routeGroup.add(cached);
+      return;
+    }
+    const routeScene = new THREE.Group();
 
     const visibleEntries = this.visibleTerrainEntries(day);
     visibleEntries.forEach(({ stop, index }, visibleIndex) => {
       const marker = this.createMarker(index + 1, stop.coord, REGION_CONFIG[day.region].color);
-      this.routeGroup.add(marker);
+      routeScene.add(marker);
       if (visibleIndex > 0) {
         const mode = stop.mode;
         const previousStop = visibleEntries[visibleIndex - 1].stop;
-        this.routeGroup.add(this.createRouteSegment(
+        routeScene.add(this.createRouteSegment(
           previousStop,
           stop,
           mode,
@@ -1600,9 +1677,12 @@ class TerrainStage {
         this.orientVehicle(vehicle, tangent, vehiclePoint);
         vehicle.scale.multiplyScalar(1.04);
         vehicle.userData.routeVehicle = true;
-        this.routeGroup.add(vehicle);
+        routeScene.add(vehicle);
       }
     });
+    this.dayRouteCache.set(cacheKey, routeScene);
+    this.routeGroup.add(routeScene);
+    this.renderer.shadowMap.needsUpdate = true;
   }
 
   meshMaterial(color, roughness = .62) {
@@ -1893,7 +1973,7 @@ class TerrainStage {
       this.applyUserView();
       return;
     }
-    this.setCameraTween(toPosition, toTarget, instant ? 1 : 1450);
+    this.setCameraTween(toPosition, toTarget, instant ? 1 : 900);
   }
 
   focusStop(stepIndex, instant = false) {
@@ -1903,7 +1983,7 @@ class TerrainStage {
     const normal = this.surfaceNormal(point);
     const position = point.clone().add(normal.multiplyScalar(distance * .72)).add(new THREE.Vector3(0, distance * .22, distance * .58));
     const target = point.clone().add(this.surfaceNormal(point).multiplyScalar(.6));
-    this.setCameraTween(position, target, instant ? 1 : 1250);
+    this.setCameraTween(position, target, instant ? 1 : 800);
   }
 
   setCameraTween(toPosition, toTarget, duration) {

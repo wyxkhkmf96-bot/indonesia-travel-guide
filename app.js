@@ -363,7 +363,7 @@ function setGlobalLoading(value, label) {
   window.clearTimeout(globalLoadTimer);
   globalLoader.root.style.setProperty("--progress", `${globalLoadValue}%`);
   globalLoader.value.textContent = `${globalLoadValue}%`;
-  if (label) globalLoader.label.textContent = label;
+  globalLoader.label.textContent = next >= 100 ? "加载完成" : "加载中，请稍等";
   if (next >= 100) {
     globalLoadValue = 100;
     globalLoadTimer = window.setTimeout(() => {
@@ -967,7 +967,7 @@ async function showTerrainDay(index, crossRegion) {
     document.body.classList.remove("terrain-mode");
     document.body.classList.add("globe-transition");
     globe.focus(index, false, true);
-    await new Promise(resolve => window.setTimeout(resolve, 1050));
+    await new Promise(resolve => window.setTimeout(resolve, 700));
     if (token !== transitionToken) return;
   }
 

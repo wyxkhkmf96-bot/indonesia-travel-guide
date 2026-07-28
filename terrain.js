@@ -109,10 +109,10 @@ class TerrainStage {
     this.renderer.shadowMap.type = THREE.PCFShadowMap;
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.08;
+    this.renderer.toneMappingExposure = 1.16;
 
     this.scene = new THREE.Scene();
-    this.scene.fog = new THREE.FogExp2(0x0a2926, .0045);
+    this.scene.fog = new THREE.FogExp2(0x01050a, .0025);
     this.camera = new THREE.PerspectiveCamera(34, 1, .1, 420);
     this.camera.position.set(0, 23, 28);
     this.camera.lookAt(this.cameraTarget);
@@ -121,6 +121,7 @@ class TerrainStage {
     this.routeGroup = new THREE.Group();
     this.detailGroup = new THREE.Group();
     this.scene.add(this.worldGroup, this.routeGroup, this.detailGroup);
+    this.addSpaceBackdrop();
     this.addLights();
 
     this.resize = this.resize.bind(this);
@@ -142,10 +143,10 @@ class TerrainStage {
   }
 
   addLights() {
-    const hemi = new THREE.HemisphereLight(0xd8fbff, 0x21453d, 2.3);
+    const hemi = new THREE.HemisphereLight(0x9cefff, 0x06110a, 1.55);
     this.scene.add(hemi);
 
-    const key = new THREE.DirectionalLight(0xfff0d2, 3.8);
+    const key = new THREE.DirectionalLight(0xfff4ce, 4.65);
     key.position.set(-12, 28, 16);
     key.castShadow = true;
     key.shadow.mapSize.set(1024, 1024);
@@ -155,9 +156,89 @@ class TerrainStage {
     key.shadow.camera.bottom = -28;
     this.scene.add(key);
 
-    const rim = new THREE.DirectionalLight(0x80d9dd, 1.7);
+    const rim = new THREE.DirectionalLight(0x26dfff, 3.1);
     rim.position.set(20, 10, -20);
     this.scene.add(rim);
+
+    const greenFill = new THREE.DirectionalLight(0x8de83d, .72);
+    greenFill.position.set(-22, -4, -8);
+    this.scene.add(greenFill);
+  }
+
+  addSpaceBackdrop() {
+    const positions = [];
+    let seed = 94721;
+    const random = () => {
+      seed = (seed * 16807) % 2147483647;
+      return (seed - 1) / 2147483646;
+    };
+    for (let index = 0; index < 520; index += 1) {
+      const radius = 72 + random() * 70;
+      const theta = random() * Math.PI * 2;
+      const phi = Math.acos(2 * random() - 1);
+      positions.push(
+        radius * Math.sin(phi) * Math.cos(theta),
+        radius * Math.cos(phi),
+        radius * Math.sin(phi) * Math.sin(theta)
+      );
+    }
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+    const stars = new THREE.Points(
+      geometry,
+      new THREE.PointsMaterial({
+        color: 0xc7f4ff,
+        size: .22,
+        sizeAttenuation: true,
+        transparent: true,
+        opacity: .78,
+        depthWrite: false,
+        fog: false
+      })
+    );
+    stars.renderOrder = -10;
+    this.scene.add(stars);
+  }
+
+  createAtmosphere(radius, centerY = 0, color = 0x25dfff) {
+    const material = new THREE.ShaderMaterial({
+      uniforms: {
+        glowColor: { value: new THREE.Color(color) },
+        glowStrength: { value: .92 }
+      },
+      vertexShader: `
+        varying vec3 vNormal;
+        varying vec3 vViewDirection;
+        void main() {
+          vec4 viewPosition = modelViewMatrix * vec4(position, 1.0);
+          vNormal = normalize(normalMatrix * normal);
+          vViewDirection = normalize(-viewPosition.xyz);
+          gl_Position = projectionMatrix * viewPosition;
+        }
+      `,
+      fragmentShader: `
+        uniform vec3 glowColor;
+        uniform float glowStrength;
+        varying vec3 vNormal;
+        varying vec3 vViewDirection;
+        void main() {
+          float rim = pow(1.0 - max(0.0, dot(vNormal, vViewDirection)), 2.35);
+          gl_FragColor = vec4(glowColor, rim * glowStrength);
+        }
+      `,
+      side: THREE.BackSide,
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      fog: false
+    });
+    const atmosphere = new THREE.Mesh(
+      new THREE.SphereGeometry(radius, 72, 48),
+      material
+    );
+    atmosphere.position.y = centerY;
+    atmosphere.renderOrder = 2;
+    return atmosphere;
   }
 
   setProgress(value, label) {
@@ -333,8 +414,12 @@ class TerrainStage {
     const cloud = new THREE.Group();
     const material = new THREE.MeshStandardMaterial({
       color: 0xfffbeb,
-      roughness: .92,
-      metalness: 0
+      emissive: 0x315b55,
+      emissiveIntensity: .18,
+      roughness: .86,
+      metalness: 0,
+      transparent: true,
+      opacity: .9
     });
     [
       [-.42, .02, 0, .42],
@@ -429,7 +514,7 @@ class TerrainStage {
   async buildArrivalGlobe() {
     this.currentRegion = "arrival";
     document.querySelector("#terrain-loading")?.classList.remove("ready");
-    this.setProgress(36, "正在生成亚太微缩地球");
+    this.setProgress(36, "正在生成亚太微缩行星");
     await new Promise(resolve => requestAnimationFrame(resolve));
     this.disposeGroup(this.worldGroup);
     this.disposeGroup(this.routeGroup);
@@ -437,10 +522,13 @@ class TerrainStage {
     const ocean = new THREE.Mesh(
       new THREE.SphereGeometry(14, 96, 64),
       new THREE.MeshPhysicalMaterial({
-        color: 0x43a9b4,
-        roughness: .34,
-        clearcoat: .48,
-        clearcoatRoughness: .32
+        color: 0x087489,
+        emissive: 0x003d4e,
+        emissiveIntensity: .34,
+        roughness: .22,
+        metalness: .08,
+        clearcoat: .82,
+        clearcoatRoughness: .2
       })
     );
     ocean.receiveShadow = true;
@@ -449,10 +537,10 @@ class TerrainStage {
     const grid = new THREE.Mesh(
       new THREE.SphereGeometry(14.05, 48, 32),
       new THREE.MeshBasicMaterial({
-        color: 0xd2fff3,
+        color: 0x62edff,
         wireframe: true,
         transparent: true,
-        opacity: .055,
+        opacity: .025,
         depthWrite: false
       })
     );
@@ -472,7 +560,7 @@ class TerrainStage {
       new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: .88, metalness: 0 }),
       landCoordinates.length
     );
-    const palette = [0xdbe989, 0xf2bd9e, 0xb9d99a, 0xf2d889, 0xcdb9e8];
+    const palette = [0x7fcf32, 0x5fb52e, 0xa5d841, 0x40972b, 0x86c93a];
     const matrix = new THREE.Matrix4();
     const quaternion = new THREE.Quaternion();
     const scale = new THREE.Vector3(1, 1, 1);
@@ -491,13 +579,14 @@ class TerrainStage {
     this.worldGroup.add(landTiles);
 
     [
-      [[86, 30], 0xb89b72, 1.2],
-      [[138, 36], 0x7ba36c, .72],
-      [[113, -8], 0x6d9565, .82],
-      [[147, -6], 0x7a9f69, .7]
+      [[86, 30], 0x607b37, 1.2],
+      [[138, 36], 0x4c8d38, .72],
+      [[113, -8], 0x397c34, .82],
+      [[147, -6], 0x4a8735, .7]
     ].forEach(([coordinate, color, mountainScale]) => {
       this.worldGroup.add(this.createArrivalMountain(coordinate, color, mountainScale));
     });
+    this.worldGroup.add(this.createArrivalForest());
 
     [
       [[54, 8], 1.05],
@@ -512,19 +601,43 @@ class TerrainStage {
       this.worldGroup.add(cloud);
     });
 
-    const atmosphere = new THREE.Mesh(
-      new THREE.SphereGeometry(14.42, 72, 48),
-      new THREE.MeshBasicMaterial({
-        color: 0x8cecf0,
-        side: THREE.BackSide,
-        transparent: true,
-        opacity: .13,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false
-      })
-    );
-    this.worldGroup.add(atmosphere);
+    this.worldGroup.add(this.createAtmosphere(14.72, 0, 0x22dcff));
     this.setProgress(76, "正在绘制上海至泗水航线");
+  }
+
+  createArrivalForest() {
+    const coordinates = [];
+    for (let latitude = -42; latitude <= 56; latitude += 6) {
+      for (let longitude = 28; longitude <= 166; longitude += 6) {
+        const variation = Math.abs(Math.sin(longitude * 12.71 + latitude * 8.17));
+        if (variation > .42 && window.d3.geoContains(this.land, [longitude, latitude])) {
+          coordinates.push([longitude, latitude, .7 + variation * .55]);
+        }
+      }
+    }
+    const geometry = new THREE.ConeGeometry(.1, .38, 6);
+    const material = new THREE.MeshStandardMaterial({
+      color: 0x3d972d,
+      emissive: 0x0c300c,
+      emissiveIntensity: .16,
+      roughness: .9,
+      flatShading: true
+    });
+    const forest = new THREE.InstancedMesh(geometry, material, coordinates.length);
+    const matrix = new THREE.Matrix4();
+    const quaternion = new THREE.Quaternion();
+    const unitY = new THREE.Vector3(0, 1, 0);
+    coordinates.forEach(([longitude, latitude, treeScale], index) => {
+      const base = this.arrivalPoint([longitude, latitude], 14.14);
+      const normal = base.clone().normalize();
+      const position = base.clone().add(normal.clone().multiplyScalar(.18 * treeScale));
+      quaternion.setFromUnitVectors(unitY, normal);
+      matrix.compose(position, quaternion, new THREE.Vector3(treeScale, treeScale, treeScale));
+      forest.setMatrixAt(index, matrix);
+    });
+    forest.instanceMatrix.needsUpdate = true;
+    forest.castShadow = true;
+    return forest;
   }
 
   buildArrivalRoute() {
@@ -642,11 +755,11 @@ class TerrainStage {
   }
 
   colorForHeight(height) {
-    if (height < .34) return new THREE.Color(0xe7d39a);
-    if (height < 1.1) return new THREE.Color(0x85bd72);
-    if (height < 2.7) return new THREE.Color(0x5e9b69);
-    if (height < 4.8) return new THREE.Color(0x8c7658);
-    return new THREE.Color(0xd9d1ba);
+    if (height < .34) return new THREE.Color(0xd8d07a);
+    if (height < 1.1) return new THREE.Color(0x79c62d);
+    if (height < 2.7) return new THREE.Color(0x4d9e2e);
+    if (height < 4.8) return new THREE.Color(0x526f36);
+    return new THREE.Color(0x8d9270);
   }
 
   isLand(coordinate, config) {
@@ -719,13 +832,15 @@ class TerrainStage {
   createGlobe(config) {
     const globe = new THREE.Group();
     const oceanMaterial = new THREE.MeshPhysicalMaterial({
-      color: 0x3f9cae,
-      roughness: .3,
-      metalness: .04,
+      color: 0x08778d,
+      emissive: 0x003a49,
+      emissiveIntensity: .38,
+      roughness: .2,
+      metalness: .08,
       transparent: true,
       opacity: .98,
-      clearcoat: .58,
-      clearcoatRoughness: .28
+      clearcoat: .85,
+      clearcoatRoughness: .18
     });
 
     const ocean = new THREE.Mesh(new THREE.SphereGeometry(GLOBE_RADIUS, 96, 64), oceanMaterial);
@@ -736,29 +851,17 @@ class TerrainStage {
     const grid = new THREE.Mesh(
       new THREE.SphereGeometry(GLOBE_RADIUS + .06, 48, 32),
       new THREE.MeshBasicMaterial({
-        color: 0xc9f5ed,
+        color: 0x6aefff,
         wireframe: true,
         transparent: true,
-        opacity: .055,
+        opacity: .022,
         depthWrite: false
       })
     );
     grid.position.y = GLOBE_CENTER_Y;
     globe.add(grid);
 
-    const atmosphere = new THREE.Mesh(
-      new THREE.SphereGeometry(GLOBE_RADIUS + .42, 72, 48),
-      new THREE.MeshBasicMaterial({
-        color: config.color,
-        side: THREE.BackSide,
-        transparent: true,
-        opacity: .1,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false
-      })
-    );
-    atmosphere.position.y = GLOBE_CENTER_Y;
-    globe.add(atmosphere);
+    globe.add(this.createAtmosphere(GLOBE_RADIUS + .76, GLOBE_CENTER_Y, 0x21ddff));
     return globe;
   }
 
@@ -777,6 +880,70 @@ class TerrainStage {
     crown.castShadow = true;
     tree.add(trunk, crown);
     return tree;
+  }
+
+  createForest(config) {
+    const entries = [];
+    config.forests.forEach((coordinate, forestIndex) => {
+      for (let index = 0; index < 18; index += 1) {
+        const angle = index * 2.399 + forestIndex * .83;
+        const radius = .24 + (index % 6) * .16;
+        const scale = .52 + ((index * 7 + forestIndex * 3) % 8) * .045;
+        entries.push({
+          coord: [
+            coordinate[0] + Math.cos(angle) * radius / this.regionScale(config),
+            coordinate[1] + Math.sin(angle) * radius / this.regionScale(config)
+          ],
+          scale
+        });
+      }
+    });
+
+    const group = new THREE.Group();
+    const trunkGeometry = new THREE.CylinderGeometry(.05, .075, .48, 6);
+    const crownGeometry = new THREE.ConeGeometry(.27, .78, 7);
+    const trunks = new THREE.InstancedMesh(
+      trunkGeometry,
+      new THREE.MeshStandardMaterial({ color: 0x6f4d2e, roughness: .95 }),
+      entries.length
+    );
+    const crowns = new THREE.InstancedMesh(
+      crownGeometry,
+      new THREE.MeshStandardMaterial({
+        color: 0x2f8e2e,
+        emissive: 0x0b2d0c,
+        emissiveIntensity: .15,
+        roughness: .88,
+        flatShading: true
+      }),
+      entries.length
+    );
+    const matrix = new THREE.Matrix4();
+    const quaternion = new THREE.Quaternion();
+    const unitY = new THREE.Vector3(0, 1, 0);
+    entries.forEach(({ coord, scale }, index) => {
+      const base = this.terrainPoint(coord, .02, config);
+      const normal = this.surfaceNormal(base);
+      quaternion.setFromUnitVectors(unitY, normal);
+      matrix.compose(
+        base.clone().add(normal.clone().multiplyScalar(.24 * scale)),
+        quaternion,
+        new THREE.Vector3(scale, scale, scale)
+      );
+      trunks.setMatrixAt(index, matrix);
+      matrix.compose(
+        base.clone().add(normal.clone().multiplyScalar(.82 * scale)),
+        quaternion,
+        new THREE.Vector3(scale, scale, scale)
+      );
+      crowns.setMatrixAt(index, matrix);
+    });
+    trunks.instanceMatrix.needsUpdate = true;
+    crowns.instanceMatrix.needsUpdate = true;
+    trunks.castShadow = true;
+    crowns.castShadow = true;
+    group.add(trunks, crowns);
+    return group;
   }
 
   createBeach(beach, config) {
@@ -813,18 +980,20 @@ class TerrainStage {
     this.currentRegion = regionKey;
     document.querySelector("#terrain-stage")?.classList.add("building");
     document.querySelector("#terrain-loading")?.classList.remove("ready");
-    this.setProgress(38, `正在生成${config.name}立体海岸`);
+    this.setProgress(38, `正在生成${config.name}行星地貌`);
     await new Promise(resolve => requestAnimationFrame(resolve));
 
     this.disposeGroup(this.worldGroup);
     this.worldGroup.add(this.createGlobe(config));
 
-    this.setProgress(58, `正在抬升${config.name}山脉`);
+    this.setProgress(58, `正在抬升${config.name}山脉与植被`);
     const terrain = new THREE.Mesh(
       this.buildTerrainGeometry(config),
       new THREE.MeshStandardMaterial({
         vertexColors: true,
-        roughness: .83,
+        emissive: 0x102d0d,
+        emissiveIntensity: .13,
+        roughness: .78,
         metalness: .01,
         flatShading: true,
         side: THREE.DoubleSide
@@ -839,20 +1008,7 @@ class TerrainStage {
     });
     config.beaches.forEach(beach => this.worldGroup.add(this.createBeach(beach, config)));
 
-    config.forests.forEach((coordinate, forestIndex) => {
-      for (let index = 0; index < 7; index += 1) {
-        const angle = index * 2.17 + forestIndex;
-        const radius = .35 + (index % 3) * .26;
-        const tree = this.createTree(.65 + (index % 2) * .18);
-        const lonOffset = Math.cos(angle) * radius / this.regionScale(config);
-        const latOffset = Math.sin(angle) * radius / this.regionScale(config);
-        const treeCoord = [coordinate[0] + lonOffset, coordinate[1] + latOffset];
-        const point = this.terrainPoint(treeCoord, 0, config);
-        tree.position.copy(point);
-        this.alignToSurface(tree, point);
-        this.worldGroup.add(tree);
-      }
-    });
+    this.worldGroup.add(this.createForest(config));
 
     const [minLon, maxLon, minLat, maxLat] = config.bounds;
     [

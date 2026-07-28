@@ -322,6 +322,21 @@ body.intro-open .transport-card {
 
 .stage { position: absolute; inset: 0; overflow: hidden; }
 
+.stage::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: 0 0 0 38%;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 66% 48%, rgba(0,160,190,.18), transparent 42%),
+    radial-gradient(circle at 12% 20%, rgba(170,235,255,.68) 0 1px, transparent 1.4px),
+    radial-gradient(circle at 72% 14%, rgba(255,255,255,.52) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 44% 76%, rgba(85,196,255,.52) 0 1px, transparent 1.4px),
+    #01050a;
+  background-size: 100% 100%, 143px 151px, 197px 181px, 251px 239px, 100% 100%;
+}
+
 .terrain-stage {
   position: absolute;
   top: 72px;
@@ -334,6 +349,14 @@ body.intro-open .transport-card {
   transform: scale(.72);
   transform-origin: right center;
   pointer-events: none;
+  background-color: #01050a;
+  background-image:
+    radial-gradient(circle at 18% 24%, rgba(191,241,255,.8) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 76% 18%, rgba(92,204,255,.65) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 42% 78%, rgba(255,255,255,.6) 0 1px, transparent 1.6px),
+    radial-gradient(circle at 88% 70%, rgba(133,225,255,.5) 0 1px, transparent 1.5px),
+    radial-gradient(ellipse at 62% 48%, rgba(0,118,142,.16), transparent 57%);
+  background-size: 131px 137px, 173px 167px, 211px 223px, 257px 241px, 100% 100%;
   transition: opacity .7s ease, transform 1.55s cubic-bezier(.16,.82,.22,1), filter .8s ease;
 }
 
@@ -342,7 +365,9 @@ body.intro-open .transport-card {
   inset: 0 0 0 230px;
   width: calc(100% - 230px);
   height: 100%;
-  filter: drop-shadow(0 34px 70px rgba(0,0,0,.34));
+  filter:
+    drop-shadow(0 0 30px rgba(31,220,255,.22))
+    drop-shadow(0 34px 70px rgba(0,0,0,.42));
   cursor: grab;
   touch-action: none;
 }
@@ -353,9 +378,9 @@ body.intro-open .transport-card {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 70% 86% at 52% 49%, transparent 50%, rgba(5,25,22,.12) 70%, rgba(5,25,22,.72) 100%),
-    linear-gradient(90deg, rgba(5,25,22,.68) 0%, rgba(5,25,22,.08) 14%, transparent 34%),
-    linear-gradient(0deg, rgba(5,25,22,.48), transparent 24%);
+    radial-gradient(ellipse 72% 88% at 55% 48%, transparent 56%, rgba(0,5,10,.2) 72%, rgba(0,3,8,.76) 100%),
+    linear-gradient(90deg, rgba(1,10,13,.9) 0%, rgba(1,10,13,.22) 16%, transparent 38%),
+    linear-gradient(0deg, rgba(0,5,9,.62), transparent 26%);
   pointer-events: none;
 }
 
@@ -659,9 +684,9 @@ body.terrain-unavailable .globe-viewport {
   aspect-ratio: 1;
   border-radius: 50%;
   background:
-    radial-gradient(circle, color-mix(in srgb, var(--day-accent) 28%, transparent), transparent 66%),
-    radial-gradient(circle, rgba(216,239,118,.12), transparent 72%);
-  filter: blur(14px);
+    radial-gradient(circle, rgba(25,220,255,.32), transparent 63%),
+    radial-gradient(circle, rgba(62,255,184,.12), transparent 72%);
+  filter: blur(18px);
   transition: background 1s ease;
   animation: globe-breathe 4s ease-in-out infinite;
 }
@@ -687,7 +712,9 @@ body.terrain-unavailable .globe-viewport {
   z-index: 3;
   width: 88%;
   height: 88%;
-  filter: drop-shadow(0 34px 36px rgba(0,0,0,.42));
+  filter:
+    drop-shadow(0 0 24px rgba(22,220,255,.42))
+    drop-shadow(0 34px 42px rgba(0,0,0,.5));
 }
 
 .globe-shine {

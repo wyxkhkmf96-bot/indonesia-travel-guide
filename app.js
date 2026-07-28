@@ -402,7 +402,7 @@ class CuteGlobe {
     this.frame = null;
     this.features = [];
     this.mesh = null;
-    this.palette = ["#bedb9d", "#f5d889", "#f3ad91", "#9dd3c2", "#cabde7", "#f5c7cf"];
+    this.palette = ["#8bcf38", "#65b82f", "#a7d846", "#4f9c31", "#93c940", "#76b936"];
     this.projection = d3.geoOrthographic().precision(.45).clipAngle(90);
     this.path = d3.geoPath(this.projection, this.ctx);
     this.graticule = d3.geoGraticule10();
@@ -712,15 +712,15 @@ class CuteGlobe {
       this.width * .37, this.height * .29, 0,
       this.width * .5, this.height * .5, Math.min(this.width, this.height) * .48
     );
-    ocean.addColorStop(0, "#aee1e3");
-    ocean.addColorStop(.55, "#67afbd");
-    ocean.addColorStop(1, "#287785");
+    ocean.addColorStop(0, "#54d8e7");
+    ocean.addColorStop(.5, "#12889d");
+    ocean.addColorStop(1, "#034b5d");
     ctx.fillStyle = ocean;
     ctx.fill();
 
     ctx.beginPath();
     this.path(this.graticule);
-    ctx.strokeStyle = "rgba(255,255,255,.14)";
+    ctx.strokeStyle = "rgba(110,239,255,.12)";
     ctx.lineWidth = .65;
     ctx.stroke();
 
@@ -735,7 +735,7 @@ class CuteGlobe {
     if (this.mesh && this.zoom <= 4) {
       ctx.beginPath();
       this.path(this.mesh);
-      ctx.strokeStyle = "rgba(18,71,65,.32)";
+      ctx.strokeStyle = "rgba(13,76,45,.38)";
       ctx.lineWidth = .55;
       ctx.stroke();
     }
@@ -766,14 +766,14 @@ class CuteGlobe {
 
     ctx.beginPath();
     this.path({ type: "Sphere" });
-    ctx.strokeStyle = "rgba(255,255,255,.62)";
-    ctx.lineWidth = 2.2;
+    ctx.strokeStyle = "rgba(128,245,255,.82)";
+    ctx.lineWidth = 2.6;
     ctx.stroke();
 
     ctx.beginPath();
     this.path({ type: "Sphere" });
-    ctx.strokeStyle = "rgba(149,201,190,.22)";
-    ctx.lineWidth = 9;
+    ctx.strokeStyle = "rgba(21,220,255,.3)";
+    ctx.lineWidth = 13;
     ctx.stroke();
     ctx.restore();
   }

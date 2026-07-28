@@ -491,6 +491,7 @@ body.arrival-globe-mode .flight-line-3d {
   display: grid;
   gap: 10px;
   min-height: 0;
+  pointer-events: auto;
 }
 
 .terrain-photo-strip figure {

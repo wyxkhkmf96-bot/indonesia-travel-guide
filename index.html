@@ -70,11 +70,11 @@
             <ol id="terrain-stop-key"></ol>
           </div>
           <div class="terrain-photo-strip">
-            <figure>
+            <figure class="zoomable-photo">
               <img id="terrain-photo-a" alt="" loading="lazy" decoding="async" fetchpriority="low">
               <figcaption id="terrain-photo-caption-a"></figcaption>
             </figure>
-            <figure>
+            <figure class="zoomable-photo">
               <img id="terrain-photo-b" alt="" loading="lazy" decoding="async" fetchpriority="low">
               <figcaption id="terrain-photo-caption-b"></figcaption>
             </figure>
@@ -236,6 +236,14 @@
       </footer>
     </div>
   </aside>
+
+  <div class="image-lightbox" id="image-lightbox" role="dialog" aria-modal="true" aria-label="景点图片大图" aria-hidden="true">
+    <button class="image-lightbox-close" id="image-lightbox-close" type="button" aria-label="关闭大图">×</button>
+    <figure>
+      <img id="image-lightbox-photo" alt="">
+      <figcaption id="image-lightbox-caption"></figcaption>
+    </figure>
+  </div>
 
   <noscript>
     <div class="noscript">此行程舞台需要启用 JavaScript 才能切换 10 天内容。</div>

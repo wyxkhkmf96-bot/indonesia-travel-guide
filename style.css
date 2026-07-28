@@ -504,11 +504,52 @@ body.arrival-globe-mode .flight-line-3d {
   box-shadow: 0 18px 42px rgba(0,0,0,.25);
 }
 
+.terrain-photo-strip .zoomable-photo {
+  cursor: zoom-in;
+  transition: transform .24s ease, border-color .24s ease, box-shadow .24s ease;
+}
+
+.terrain-photo-strip .zoomable-photo::after {
+  content: "＋ 放大";
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  padding: 5px 7px;
+  border: 1px solid rgba(255,255,255,.24);
+  border-radius: 999px;
+  color: #fff;
+  background: rgba(2,13,19,.68);
+  backdrop-filter: blur(8px);
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  opacity: .72;
+  transition: opacity .2s ease, transform .2s ease;
+}
+
+.terrain-photo-strip .zoomable-photo:hover,
+.terrain-photo-strip .zoomable-photo:focus-visible {
+  transform: translateY(-2px);
+  border-color: rgba(101,235,255,.55);
+  box-shadow: 0 22px 52px rgba(0,0,0,.36), 0 0 22px rgba(59,221,255,.12);
+  outline: none;
+}
+
+.terrain-photo-strip .zoomable-photo:hover::after,
+.terrain-photo-strip .zoomable-photo:focus-visible::after {
+  opacity: 1;
+  transform: scale(1.04);
+}
+
 .terrain-photo-strip img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform .45s cubic-bezier(.2,.8,.2,1);
 }
+
+.terrain-photo-strip .zoomable-photo:hover img { transform: scale(1.035); }
 
 .terrain-photo-strip figcaption {
   position: absolute;
@@ -521,6 +562,84 @@ body.arrival-globe-mode .flight-line-3d {
   font-size: 7px;
   font-weight: 800;
   letter-spacing: .05em;
+}
+
+.image-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: grid;
+  place-items: center;
+  padding: 44px;
+  color: #fff;
+  background: rgba(0,5,9,.86);
+  backdrop-filter: blur(18px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .28s ease, visibility .28s ease;
+}
+
+.image-lightbox.is-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.image-lightbox figure {
+  position: relative;
+  display: grid;
+  gap: 12px;
+  max-width: min(1120px, 92vw);
+  max-height: 90vh;
+  margin: 0;
+  transform: scale(.94) translateY(12px);
+  transition: transform .35s cubic-bezier(.16,.82,.22,1);
+}
+
+.image-lightbox.is-open figure { transform: scale(1) translateY(0); }
+
+.image-lightbox img {
+  display: block;
+  max-width: 92vw;
+  max-height: 80vh;
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 22px;
+  object-fit: contain;
+  box-shadow: 0 32px 110px rgba(0,0,0,.72), 0 0 50px rgba(55,215,255,.1);
+}
+
+.image-lightbox figcaption {
+  color: rgba(255,255,255,.82);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-align: center;
+}
+
+.image-lightbox-close {
+  position: absolute;
+  top: 24px;
+  right: 28px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  padding: 0 0 4px;
+  border: 1px solid rgba(255,255,255,.25);
+  border-radius: 50%;
+  color: #fff;
+  background: rgba(255,255,255,.08);
+  cursor: pointer;
+  font-size: 28px;
+  line-height: 1;
+  transition: background .2s ease, transform .2s ease;
+}
+
+.image-lightbox-close:hover,
+.image-lightbox-close:focus-visible {
+  background: rgba(101,235,255,.2);
+  transform: rotate(6deg) scale(1.05);
+  outline: none;
 }
 
 .terrain-source {
@@ -1521,6 +1640,10 @@ body.terrain-mode .step-controls { display: none; }
     width: calc(100vw - 28px);
     padding: 21px 20px 22px;
   }
+
+  .image-lightbox { padding: 58px 14px 24px; }
+  .image-lightbox img { max-width: calc(100vw - 28px); max-height: 76vh; border-radius: 16px; }
+  .image-lightbox-close { top: 14px; right: 14px; }
 
   body { overflow: hidden; }
   .intro { padding: 28px 24px; align-items: end; padding-bottom: 14vh; }

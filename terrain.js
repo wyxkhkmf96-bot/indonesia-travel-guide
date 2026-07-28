@@ -1656,8 +1656,18 @@ class TerrainStage {
     const routeScene = new THREE.Group();
 
     const visibleEntries = this.visibleTerrainEntries(day);
+    const localStops = visibleEntries.map(({ stop }) => this.toLocal(stop.coord, REGION_CONFIG[day.region]));
+    const spreadX = localStops.length
+      ? Math.max(...localStops.map(point => point.x)) - Math.min(...localStops.map(point => point.x))
+      : 0;
+    const spreadZ = localStops.length
+      ? Math.max(...localStops.map(point => point.z)) - Math.min(...localStops.map(point => point.z))
+      : 0;
+    const routeSpread = Math.max(spreadX, spreadZ);
+    const clusterScale = THREE.MathUtils.clamp(.48 + routeSpread * .075, .48, 1);
     visibleEntries.forEach(({ stop, index }, visibleIndex) => {
       const marker = this.createMarker(index + 1, stop.coord, REGION_CONFIG[day.region].color);
+      marker.scale.multiplyScalar(clusterScale);
       routeScene.add(marker);
       if (visibleIndex > 0) {
         const mode = stop.mode;
@@ -1675,7 +1685,7 @@ class TerrainStage {
         const tangent = routeCurve.getTangent(.53);
         vehicle.position.copy(vehiclePoint);
         this.orientVehicle(vehicle, tangent, vehiclePoint);
-        vehicle.scale.multiplyScalar(1.04);
+        vehicle.scale.multiplyScalar(THREE.MathUtils.lerp(.56, 1.04, clusterScale));
         vehicle.userData.routeVehicle = true;
         routeScene.add(vehicle);
       }
@@ -1951,13 +1961,18 @@ class TerrainStage {
     const maxZ = Math.max(...localPoints.map(point => point.z));
     const centerX = (minX + maxX) / 2;
     const centerZ = (minZ + maxZ) / 2;
-    const spanX = Math.max(8, maxX - minX + 14);
-    const spanZ = Math.max(7, maxZ - minZ + 10.5);
+    const rawSpanX = maxX - minX;
+    const rawSpanZ = maxZ - minZ;
+    const routeSpread = Math.max(rawSpanX, rawSpanZ);
+    const compactRoute = routeSpread < 4.5;
+    const spanX = Math.max(compactRoute ? 4.2 : 7.5, rawSpanX + (compactRoute ? 4.2 : 9.5));
+    const spanZ = Math.max(compactRoute ? 3.8 : 6.5, rawSpanZ + (compactRoute ? 3.8 : 7.5));
     const verticalFov = THREE.MathUtils.degToRad(this.camera.fov);
     const horizontalFov = 2 * Math.atan(Math.tan(verticalFov / 2) * Math.max(this.camera.aspect, .32));
     const fitWidth = spanX / (2 * Math.tan(horizontalFov / 2));
     const fitHeight = spanZ / (2 * Math.tan(verticalFov / 2));
-    const distance = Math.max(24, Math.max(fitWidth, fitHeight) * 1.12);
+    const minimumDistance = compactRoute ? (window.innerWidth < 720 ? 13 : 10.5) : 18;
+    const distance = Math.max(minimumDistance, Math.max(fitWidth, fitHeight) * 1.06);
     const toTarget = new THREE.Vector3(centerX, this.surfaceY(centerX, centerZ) + 1.55, centerZ);
     const normal = this.surfaceNormal(toTarget);
     const viewDirection = normal.multiplyScalar(.78).add(new THREE.Vector3(0, .18, .66)).normalize();

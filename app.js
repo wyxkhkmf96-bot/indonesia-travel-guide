@@ -810,6 +810,10 @@ const elements = {
   terrainPhotoCaptionA: document.querySelector("#terrain-photo-caption-a"),
   terrainPhotoB: document.querySelector("#terrain-photo-b"),
   terrainPhotoCaptionB: document.querySelector("#terrain-photo-caption-b"),
+  imageLightbox: document.querySelector("#image-lightbox"),
+  imageLightboxPhoto: document.querySelector("#image-lightbox-photo"),
+  imageLightboxCaption: document.querySelector("#image-lightbox-caption"),
+  imageLightboxClose: document.querySelector("#image-lightbox-close"),
   stopCount: document.querySelector("#stop-count"),
   stopProgress: document.querySelector("#stop-progress-bar"),
   previousStop: document.querySelector("#previous-stop"),
@@ -824,10 +828,52 @@ let touchStart = null;
 let transitionToken = 0;
 const globe = new CuteGlobe(document.querySelector("#globe-canvas"), days);
 const travelStage = document.querySelector(".stage");
+let lightboxReturnFocus = null;
 
 function resetStageViewport() {
   if (travelStage) travelStage.scrollTop = 0;
 }
+
+function openImageLightbox(image, caption) {
+  if (!image?.src || !elements.imageLightbox) return;
+  lightboxReturnFocus = document.activeElement;
+  elements.imageLightboxPhoto.src = image.currentSrc || image.src;
+  elements.imageLightboxPhoto.alt = image.alt;
+  elements.imageLightboxCaption.textContent = caption || image.alt;
+  elements.imageLightbox.classList.add("is-open");
+  elements.imageLightbox.setAttribute("aria-hidden", "false");
+  elements.imageLightboxClose.focus({ preventScroll: true });
+}
+
+function closeImageLightbox() {
+  if (!elements.imageLightbox?.classList.contains("is-open")) return;
+  elements.imageLightbox.classList.remove("is-open");
+  elements.imageLightbox.setAttribute("aria-hidden", "true");
+  lightboxReturnFocus?.focus?.({ preventScroll: true });
+}
+
+document.querySelectorAll(".zoomable-photo").forEach(figure => {
+  figure.tabIndex = 0;
+  figure.setAttribute("role", "button");
+  figure.setAttribute("aria-label", "点击放大景点图片");
+  const image = figure.querySelector("img");
+  const caption = figure.querySelector("figcaption");
+  const open = () => openImageLightbox(image, caption?.textContent);
+  figure.addEventListener("click", open);
+  figure.addEventListener("keydown", event => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    event.preventDefault();
+    open();
+  });
+});
+
+elements.imageLightboxClose?.addEventListener("click", closeImageLightbox);
+elements.imageLightbox?.addEventListener("click", event => {
+  if (event.target === elements.imageLightbox) closeImageLightbox();
+});
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape") closeImageLightbox();
+});
 
 const stopTransport = {
   road: ["🚐", "包车 / 陆路"],

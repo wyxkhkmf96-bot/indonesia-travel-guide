@@ -62,8 +62,11 @@
       <div class="ambient ambient-b" aria-hidden="true"></div>
 
       <div class="terrain-stage" id="terrain-stage" aria-label="当天 3D 地球路线">
-        <canvas class="terrain-canvas" id="terrain-canvas"></canvas>
+        <canvas class="terrain-canvas" id="terrain-canvas" tabindex="0" aria-label="点击单独查看 3D 地球"></canvas>
         <div class="terrain-vignette"></div>
+        <div class="globe-focus-entry" aria-hidden="true">点击地球 · 全屏查看</div>
+        <button class="globe-focus-close" id="globe-focus-close" type="button" aria-label="关闭地球全屏视图">×</button>
+        <div class="globe-focus-hint" aria-hidden="true">拖动旋转 · 滚轮或双指缩放</div>
         <aside class="terrain-sidecar" aria-label="当天景点索引与实景图">
           <div class="terrain-stop-key">
             <small>DAY ROUTE · 当天点位</small>

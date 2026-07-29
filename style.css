@@ -410,6 +410,94 @@ body.intro-open .transport-card {
 
 .terrain-canvas.is-dragging { cursor: grabbing; }
 
+.globe-focus-entry,
+.globe-focus-hint {
+  position: absolute;
+  z-index: 8;
+  left: 50%;
+  bottom: 20px;
+  padding: 8px 12px;
+  transform: translateX(-50%);
+  border: 1px solid rgba(255,255,255,.16);
+  border-radius: 999px;
+  color: rgba(255,255,255,.72);
+  background: rgba(2,13,19,.72);
+  backdrop-filter: blur(12px);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  pointer-events: none;
+}
+
+.globe-focus-close,
+.globe-focus-hint {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.globe-focus-close {
+  position: absolute;
+  z-index: 14;
+  top: 22px;
+  right: 24px;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  padding: 0 0 4px;
+  border: 1px solid rgba(255,255,255,.28);
+  border-radius: 50%;
+  color: #fff;
+  background: rgba(2,13,19,.72);
+  box-shadow: 0 16px 40px rgba(0,0,0,.32);
+  backdrop-filter: blur(12px);
+  cursor: pointer;
+  font-size: 30px;
+  line-height: 1;
+  pointer-events: none;
+  transition: opacity .25s ease, visibility .25s ease, transform .2s ease, background .2s ease;
+}
+
+.globe-focus-close:hover,
+.globe-focus-close:focus-visible {
+  background: rgba(101,235,255,.2);
+  transform: scale(1.06);
+  outline: none;
+}
+
+body.globe-fullscreen .terrain-stage {
+  position: fixed;
+  z-index: 110;
+  inset: 0;
+  height: 100dvh;
+  opacity: 1;
+  transform: none;
+  filter: none;
+  pointer-events: auto;
+}
+
+body.globe-fullscreen .terrain-canvas {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+body.globe-fullscreen .terrain-sidecar,
+body.globe-fullscreen .route-legend,
+body.globe-fullscreen .terrain-controls-hint,
+body.globe-fullscreen .terrain-source,
+body.globe-fullscreen .globe-focus-entry {
+  display: none;
+}
+
+body.globe-fullscreen .globe-focus-close,
+body.globe-fullscreen .globe-focus-hint {
+  opacity: 1;
+  visibility: visible;
+}
+
+body.globe-fullscreen .globe-focus-close { pointer-events: auto; }
+
 .terrain-vignette {
   position: absolute;
   inset: 0;
@@ -1645,6 +1733,15 @@ body.terrain-mode .step-controls { display: none; }
   .image-lightbox { padding: 58px 14px 24px; }
   .image-lightbox img { max-width: calc(100vw - 28px); max-height: 76vh; border-radius: 16px; }
   .image-lightbox-close { top: 14px; right: 14px; }
+  .globe-focus-entry { bottom: 58px; }
+  .globe-focus-close {
+    top: calc(14px + env(safe-area-inset-top, 0px));
+    right: 14px;
+  }
+  .globe-focus-hint {
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    white-space: nowrap;
+  }
 
   body { overflow: hidden; }
   .intro { padding: 28px 24px; align-items: end; padding-bottom: 14vh; }

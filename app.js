@@ -814,6 +814,8 @@ const elements = {
   imageLightboxPhoto: document.querySelector("#image-lightbox-photo"),
   imageLightboxCaption: document.querySelector("#image-lightbox-caption"),
   imageLightboxClose: document.querySelector("#image-lightbox-close"),
+  terrainCanvas: document.querySelector("#terrain-canvas"),
+  globeFocusClose: document.querySelector("#globe-focus-close"),
   stopCount: document.querySelector("#stop-count"),
   stopProgress: document.querySelector("#stop-progress-bar"),
   previousStop: document.querySelector("#previous-stop"),
@@ -829,6 +831,7 @@ let transitionToken = 0;
 const globe = new CuteGlobe(document.querySelector("#globe-canvas"), days);
 const travelStage = document.querySelector(".stage");
 let lightboxReturnFocus = null;
+let globeTapStart = null;
 
 function resetStageViewport() {
   if (travelStage) travelStage.scrollTop = 0;
@@ -852,6 +855,56 @@ function closeImageLightbox() {
   lightboxReturnFocus?.focus?.({ preventScroll: true });
 }
 
+function openGlobeFocus() {
+  if (
+    document.body.classList.contains("intro-open") ||
+    document.body.classList.contains("globe-fullscreen") ||
+    !document.body.classList.contains("terrain-mode")
+  ) return;
+  document.body.classList.add("globe-fullscreen");
+  elements.globeFocusClose?.focus({ preventScroll: true });
+  window.setTimeout(() => window.terrainStage?.requestRender?.(), 60);
+}
+
+function closeGlobeFocus() {
+  if (!document.body.classList.contains("globe-fullscreen")) return;
+  document.body.classList.remove("globe-fullscreen");
+  elements.terrainCanvas?.focus({ preventScroll: true });
+  window.setTimeout(() => window.terrainStage?.requestRender?.(), 60);
+}
+
+elements.terrainCanvas?.addEventListener("pointerdown", event => {
+  if (event.pointerType !== "mouse" && event.pointerType !== "touch" && event.pointerType !== "pen") return;
+  if (globeTapStart && globeTapStart.pointerId !== event.pointerId) {
+    globeTapStart = null;
+    return;
+  }
+  globeTapStart = { pointerId: event.pointerId, x: event.clientX, y: event.clientY, time: performance.now() };
+});
+
+elements.terrainCanvas?.addEventListener("pointerup", event => {
+  if (
+    !globeTapStart ||
+    globeTapStart.pointerId !== event.pointerId ||
+    document.body.classList.contains("globe-fullscreen")
+  ) {
+    globeTapStart = null;
+    return;
+  }
+  const distance = Math.hypot(event.clientX - globeTapStart.x, event.clientY - globeTapStart.y);
+  const elapsed = performance.now() - globeTapStart.time;
+  globeTapStart = null;
+  if (distance < 8 && elapsed < 500) openGlobeFocus();
+});
+
+elements.terrainCanvas?.addEventListener("pointercancel", () => { globeTapStart = null; });
+elements.terrainCanvas?.addEventListener("keydown", event => {
+  if (event.key !== "Enter" && event.key !== " ") return;
+  event.preventDefault();
+  openGlobeFocus();
+});
+elements.globeFocusClose?.addEventListener("click", closeGlobeFocus);
+
 document.querySelectorAll(".zoomable-photo").forEach(figure => {
   figure.tabIndex = 0;
   figure.setAttribute("role", "button");
@@ -872,7 +925,9 @@ elements.imageLightbox?.addEventListener("click", event => {
   if (event.target === elements.imageLightbox) closeImageLightbox();
 });
 document.addEventListener("keydown", event => {
-  if (event.key === "Escape") closeImageLightbox();
+  if (event.key !== "Escape") return;
+  closeImageLightbox();
+  closeGlobeFocus();
 });
 
 const stopTransport = {

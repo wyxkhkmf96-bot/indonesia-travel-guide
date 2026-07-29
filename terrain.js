@@ -99,6 +99,8 @@ class TerrainStage {
     this.labelSprites = [];
     this.photoSprites = [];
     this.userView = { zoom: 1, yaw: 0, pitch: 0, dragging: false, x: 0, y: 0 };
+    this.pointerPositions = new Map();
+    this.pinchDistance = null;
     this.baseCameraPosition = null;
     this.baseCameraTarget = null;
     this.frame = null;
@@ -309,40 +311,74 @@ class TerrainStage {
     this.canvas.addEventListener("wheel", event => {
       event.preventDefault();
       event.stopPropagation();
+      const focused = document.body.classList.contains("globe-fullscreen");
       if (Math.abs(event.deltaX) > Math.abs(event.deltaY) * .45) {
-        this.userView.yaw = THREE.MathUtils.clamp(this.userView.yaw - event.deltaX * .00055, -.2, .2);
+        const yawLimit = focused ? Math.PI : .2;
+        this.userView.yaw = THREE.MathUtils.clamp(this.userView.yaw - event.deltaX * .00055, -yawLimit, yawLimit);
       } else {
         this.userView.zoom = THREE.MathUtils.clamp(
           this.userView.zoom * Math.exp(event.deltaY * .00042),
-          .86,
-          1.18
+          focused ? .5 : .86,
+          focused ? 1.45 : 1.18
         );
       }
       this.applyUserView();
     }, { passive: false });
 
     this.canvas.addEventListener("pointerdown", event => {
-      this.userView.dragging = true;
+      this.pointerPositions.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      this.userView.dragging = this.pointerPositions.size === 1;
       this.userView.x = event.clientX;
       this.userView.y = event.clientY;
       this.canvas.classList.add("is-dragging");
       this.canvas.setPointerCapture?.(event.pointerId);
+      if (this.pointerPositions.size === 2) {
+        const [first, second] = [...this.pointerPositions.values()];
+        this.pinchDistance = Math.hypot(second.x - first.x, second.y - first.y);
+      }
     });
 
     this.canvas.addEventListener("pointermove", event => {
+      const previous = this.pointerPositions.get(event.pointerId);
+      if (!previous) return;
+      this.pointerPositions.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      const focused = document.body.classList.contains("globe-fullscreen");
+      if (this.pointerPositions.size === 2) {
+        const [first, second] = [...this.pointerPositions.values()];
+        const distance = Math.hypot(second.x - first.x, second.y - first.y);
+        if (this.pinchDistance && distance > 0) {
+          this.userView.zoom = THREE.MathUtils.clamp(
+            this.userView.zoom * (this.pinchDistance / distance),
+            focused ? .5 : .86,
+            focused ? 1.45 : 1.18
+          );
+          this.applyUserView();
+        }
+        this.pinchDistance = distance;
+        return;
+      }
       if (!this.userView.dragging) return;
-      const dx = event.clientX - this.userView.x;
-      const dy = event.clientY - this.userView.y;
+      const dx = event.clientX - previous.x;
+      const dy = event.clientY - previous.y;
       this.userView.x = event.clientX;
       this.userView.y = event.clientY;
-      this.userView.yaw = THREE.MathUtils.clamp(this.userView.yaw - dx * .0022, -.2, .2);
-      this.userView.pitch = THREE.MathUtils.clamp(this.userView.pitch + dy * .0017, -.13, .13);
+      const yawLimit = focused ? Math.PI : .2;
+      const pitchLimit = focused ? .52 : .13;
+      this.userView.yaw = THREE.MathUtils.clamp(this.userView.yaw - dx * .0022, -yawLimit, yawLimit);
+      this.userView.pitch = THREE.MathUtils.clamp(this.userView.pitch + dy * .0017, -pitchLimit, pitchLimit);
       this.applyUserView();
     });
 
     const finishDrag = event => {
-      this.userView.dragging = false;
-      this.canvas.classList.remove("is-dragging");
+      this.pointerPositions.delete(event.pointerId);
+      this.pinchDistance = null;
+      this.userView.dragging = this.pointerPositions.size === 1;
+      if (!this.userView.dragging) this.canvas.classList.remove("is-dragging");
+      if (this.userView.dragging) {
+        const remaining = [...this.pointerPositions.values()][0];
+        this.userView.x = remaining.x;
+        this.userView.y = remaining.y;
+      }
       if (event?.pointerId !== undefined) this.canvas.releasePointerCapture?.(event.pointerId);
     };
     this.canvas.addEventListener("pointerup", finishDrag);

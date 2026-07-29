@@ -1709,9 +1709,13 @@ body.terrain-mode .step-controls { display: none; }
     top: 25vh;
     bottom: 54px;
     width: auto;
+    display: block;
     overflow-y: auto;
-    padding-right: 4px;
+    padding: 0 4px 28px 0;
     scrollbar-width: none;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
   }
 
   body.terrain-mode .day-story {

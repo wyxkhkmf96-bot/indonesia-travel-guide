@@ -1129,7 +1129,7 @@ window.addEventListener("wheel", event => {
 }, { passive: false });
 
 window.addEventListener("touchstart", event => {
-  if (event.target.closest?.("#terrain-stage")) {
+  if (event.target.closest?.("#terrain-stage, #day-story")) {
     touchStart = null;
     return;
   }
@@ -1137,7 +1137,7 @@ window.addEventListener("touchstart", event => {
 }, { passive: true });
 
 window.addEventListener("touchend", event => {
-  if (event.target.closest?.("#terrain-stage")) {
+  if (event.target.closest?.("#terrain-stage, #day-story")) {
     touchStart = null;
     return;
   }
